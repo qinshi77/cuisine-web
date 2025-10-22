@@ -1,0 +1,16 @@
+# 忽略目录
+build/
+tests/
+dist/
+node_modules/
+public/
+src/assets/icon-park
+src/plugins/decimal
+src/assets/fonts
+
+# node 覆盖率文件
+coverage/
+
+# 忽略文件
+**/*-min.js
+**/*.min.js
