@@ -19,6 +19,11 @@ export default new Router({
       path: '/register',
       name: 'Register',
       component: Register
+    },
+    {
+      path: '/heatmap',
+      name: 'HeatMap',
+      component: () => import('../views/viewModel/index.vue')
     }
   ]
 })
