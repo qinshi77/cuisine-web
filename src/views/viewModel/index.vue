@@ -34,37 +34,6 @@
       </div>
     </div>
 
-    <!-- 底部控制区域 -->
-    <div class="footer-controls">
-      <!-- 图例 -->
-      <div class="legend">
-        <div class="legend-item">
-          <span class="legend-color high" />
-          <span>非遗美食密集区</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color medium" />
-          <span>非遗美食较多区</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-color low" />
-          <span>非遗美食分布区</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-marker national" />
-          <span>国家级非遗</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-marker provincial" />
-          <span>省级非遗</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-marker city" />
-          <span>市级非遗</span>
-        </div>
-      </div>
-    </div>
-
     <!-- 详情弹窗 -->
     <div v-if="showDetail" class="detail-popup" @click.self="handleClose">
       <div class="popup-content">
@@ -85,7 +54,7 @@
 </template>
 
 <script>
-import * as echarts from 'echarts'
+// import * as echarts from 'echarts'
 
 export default {
   name: 'QuanzhouCuisineMap',
@@ -209,30 +178,6 @@ export default {
       ]
     }
   },
-  computed: {
-    // 转换为echarts热力图所需格式
-    heatmapData() {
-      return this.cuisineData.map(item => [
-        item.longitude,
-        item.latitude,
-        item.value,
-        item.name,
-        item.level,
-        item.description,
-        item.id
-      ])
-    }
-  },
-  mounted() {
-    this.initChart()
-    window.addEventListener('resize', this.handleResize)
-  },
-  beforeDestroy() {
-    if (this.chart) {
-      this.chart.dispose()
-    }
-    window.removeEventListener('resize', this.handleResize)
-  },
   methods: {
     // 获取非遗等级文本
     getLevelText(level) {
@@ -244,191 +189,11 @@ export default {
       return levelMap[level] || '未知级别'
     },
 
-    // 获取区域类型文本
-    getAreaText(value) {
-      if (value >= 70) {
-        return '非遗美食密集区'
-      } else if (value >= 40) {
-        return '非遗美食较多区'
-      } else {
-        return '非遗美食分布区'
-      }
-    },
-
     // 显示美食详情
     showFoodDetail(food) {
       this.selectedFood = food
       this.showDetail = true
     },
-
-    // 初始化图表 - 泉州市地图
-    initChart() {
-      // 创建图表实例
-      this.chart = echarts.init(this.$refs.heatmapContainer)
-
-      // 基础配置
-      const option = {
-        backgroundColor: '#ffffff',
-        tooltip: {
-          trigger: 'item',
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderColor: '#e6e6e6',
-          borderWidth: 1,
-          textStyle: {
-            color: '#333'
-          },
-          formatter: (params) => {
-            if (params.componentType === 'series') {
-              if (params.seriesType === 'scatter') {
-                return `<div>
-                  <strong>${params.name}</strong><br/>
-                  <span>非遗等级: ${this.getLevelText(params.data.level)}</span><br/>
-                  <span>分布区域: ${params.data.location}</span>
-                </div>`
-              } else if (params.data && params.data.length >= 5) {
-                const value = params.data[2]
-                const name = params.data[3]
-                const level = params.data[4]
-                return `美食名称: ${name}<br/>非遗等级: ${this.getLevelText(level)}<br/>分布强度: ${value}<br/>区域类型: ${this.getAreaText(value)}<br/><span style="color:#999; font-size:12px;">(点击查看详情)</span>`
-              }
-            }
-            return ''
-          }
-        },
-        visualMap: {
-          min: 0,
-          max: 100,
-          calculable: true,
-          orient: 'horizontal',
-          show: false,
-          inRange: {
-            color: ['#e7f2fb', '#b3d9ff', '#66b3ff', '#1a8cff', '#0066cc']
-          }
-        },
-        grid: {
-          left: '0%',
-          right: '0%',
-          bottom: '0%',
-          top: '0%',
-          containLabel: false
-        },
-        // 泉州市区域坐标系
-        xAxis: {
-          type: 'value',
-          min: 118.45, // 泉州市西部经度
-          max: 118.75, // 泉州市东部经度
-          show: false
-        },
-        yAxis: {
-          type: 'value',
-          min: 24.80, // 泉州市南部纬度
-          max: 25.00, // 泉州市北部纬度
-          show: false
-        },
-        series: [
-          // 背景区域 - 模拟泉州市地形
-          {
-            name: '泉州市地图背景',
-            type: 'scatter',
-            data: [[118.60, 24.90]],
-            symbolSize: function() {
-              // 确保背景覆盖整个地图区域
-              return Math.max(this.chart.getWidth(), this.chart.getHeight()) / 2
-            }.bind(this),
-            itemStyle: {
-              color: '#e1f5fe', // 浅蓝色背景模拟泉州海域和地形
-              opacity: 0.3
-            },
-            z: 0
-          },
-          // 非遗美食标记点
-          {
-            name: '非遗美食',
-            type: 'scatter',
-            coordinateSystem: 'cartesian2d',
-            data: this.generateMarkerData(),
-            symbolSize: 15,
-            itemStyle: {
-              opacity: 0.8,
-              color: function(params) {
-                // 根据非遗等级设置颜色
-                const levelColorMap = {
-                  national: '#e74c3c', // 国家级 - 红色
-                  provincial: '#f39c12', // 省级 - 橙色
-                  city: '#3498db' // 市级 - 蓝色
-                }
-                return levelColorMap[params.data.level] || '#95a5a6'
-              }
-            },
-            emphasis: {
-              scale: true,
-              symbolSize: 20,
-              itemStyle: {
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.3)'
-              }
-            },
-            z: 2
-          },
-          // 热力图层
-          {
-            name: '美食热力图',
-            type: 'heatmap',
-            coordinateSystem: 'cartesian2d',
-            data: this.heatmapData,
-            pointSize: 15,
-            blurSize: 15,
-            maxOpacity: 0.8,
-            minOpacity: 0.2,
-            itemStyle: {
-              color: 'rgba(255, 69, 0, 0.8)'
-            },
-            z: 1
-          }
-        ]
-      }
-
-      // 设置配置
-      this.chart.setOption(option)
-
-      // 添加点击事件
-      this.chart.on('click', (params) => {
-        if (params.componentType === 'series') {
-          if (params.seriesType === 'scatter' && params.seriesName === '非遗美食') {
-            // 查找对应的美食数据
-            const food = this.cuisineData.find(item => item.id === params.data.id)
-            if (food) {
-              this.showFoodDetail(food)
-            }
-          } else if (params.data && params.data.length >= 7) {
-            const foodId = params.data[6]
-            const food = this.cuisineData.find(item => item.id === foodId)
-            if (food) {
-              this.showFoodDetail(food)
-            }
-          }
-        }
-      })
-    },
-
-    // 生成标记数据
-    generateMarkerData() {
-      return this.cuisineData.map(item => ({
-        name: item.name,
-        value: [item.longitude, item.latitude],
-        level: item.level,
-        location: item.location,
-        id: item.id
-      }))
-    },
-
-    // 处理窗口大小变化
-    handleResize() {
-      if (this.chart) {
-        this.chart.resize()
-      }
-    },
-
     // 关闭详情弹窗
     handleClose() {
       this.showDetail = false
@@ -476,13 +241,22 @@ export default {
   min-height: 600px;
 }
 
-.map-section {
-  flex: 2;
+/* 共享卡片样式 */
+.card {
   background-color: white;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.map-section {
+  flex: 2;
   position: relative;
+  /* 应用共享卡片样式 */
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .map-title {
@@ -500,12 +274,13 @@ export default {
 
 .cuisine-intro {
   flex: 1;
+  max-height: 600px;
+  overflow-y: auto;
+  /* 应用共享卡片样式 */
   background-color: white;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  max-height: 600px;
-  overflow-y: auto;
 }
 
 .cuisine-intro h3 {
@@ -561,72 +336,6 @@ export default {
   font-size: 14px;
   color: #666;
   line-height: 1.5;
-}
-
-.footer-controls {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.legend {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #666;
-}
-
-.legend-color {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 1px solid #e0e0e0;
-}
-
-.legend-color.high {
-  background-color: #e74c3c;
-}
-
-.legend-color.medium {
-  background-color: #f39c12;
-}
-
-.legend-color.low {
-  background-color: #3498db;
-}
-
-.legend-marker {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.legend-marker.national {
-  background-color: #e74c3c;
-}
-
-.legend-marker.provincial {
-  background-color: #f39c12;
-}
-
-.legend-marker.city {
-  background-color: #3498db;
 }
 
 /* 详情弹窗样式 */
@@ -710,12 +419,6 @@ export default {
 
   #heatmapContainer {
     height: 350px;
-  }
-
-  .legend {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
   }
 }
 </style>
