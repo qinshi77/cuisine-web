@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <!--                   顶部导航栏                        -->
     <el-menu default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1">处理中心</el-menu-item>
@@ -9,9 +9,9 @@
         <el-menu-item index="2-2">选项2</el-menu-item>
         <el-menu-item index="2-3">选项3</el-menu-item>
       </el-submenu>
-      <el-menu-item index="3" >消息中心</el-menu-item>
-      <el-menu-item index="4" >订单管理</el-menu-item>
-      <el-menu-item index="5" class="user-menu-item" ><i class="el-icon-user"></i>账户管理</el-menu-item> 
+      <el-menu-item index="3">消息中心</el-menu-item>
+      <el-menu-item index="4">订单管理</el-menu-item>
+      <el-menu-item index="5" class="user-menu-item"><i class="el-icon-user" />账户管理</el-menu-item>
     </el-menu>
     <div class="img-container">
       <el-carousel :interval="5000" arrow="always" height="400px">
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     handleSelect() {
-      console.log('点击了导航栏');
+      console.log('点击了导航栏')
     }
   }
 }
@@ -111,11 +111,11 @@ export default {
     line-height: 300px;
     margin: 0;
   }
-  
+
   .el-carousel__item:nth-child(2n) {
     background-color: #99a9bf;
   }
-  
+
   .el-carousel__item:nth-child(2n+1) {
     background-color: #d3dce6;
   }
