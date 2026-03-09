@@ -5,6 +5,8 @@ import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/register/index.vue'
 import UserCommunity from '../views/user/index.vue'
+import FoodHistory from '../views/history/index.vue'
+import UserEdit from '../views/user/author.vue'
 
 Vue.use(Router)
 
@@ -25,6 +27,16 @@ export default new Router({
       path: '/community',
       name: 'UserCommunity',
       component: UserCommunity
+    },
+    {
+      path: '/history',
+      name: 'FoodHistory',
+      component: FoodHistory
+    },
+    {
+      path: '/user/edit',
+      name: 'UserEdit',
+      component: UserEdit
     },
     {
       path: '/heatmap',

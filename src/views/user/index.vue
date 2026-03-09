@@ -5,7 +5,7 @@
       <el-menu-item index="1" @click="$router.push('/')">首页</el-menu-item>
       <el-menu-item index="2" @click="$router.push('/login')">登录</el-menu-item>
       <el-menu-item index="3" class="active">社区</el-menu-item>
-      <el-menu-item index="4"><i class="el-icon-user" />我的账户</el-menu-item>
+      <el-menu-item index="4" @click="$router.push('/user/edit')"><i class="el-icon-user" />我的账户</el-menu-item>
     </el-menu>
 
     <!-- 社区内容区域 -->
