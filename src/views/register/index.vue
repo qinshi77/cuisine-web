@@ -1,89 +1,158 @@
 <template>
-  <div class="register">
-    <h1>用户注册</h1>
-    <form>
-      <div class="form-group">
-        <label for="username">用户名</label>
-        <input type="text" id="username" placeholder="请输入用户名">
+  <div class="login-container">
+    <div class="login-bg" /> <!-- 登录背景图片 -->
+    <Card class="login-card">
+      <div class="login-header">
+        <img src="@/assets/logo.png" alt="泉州美食" class="logo">
+        <h2>泉州美食网</h2>
+        <p>登录您的账号</p>
       </div>
-      <div class="form-group">
-        <label for="email">邮箱</label>
-        <input type="email" id="email" placeholder="请输入邮箱">
-      </div>
-      <div class="form-group">
-        <label for="password">密码</label>
-        <input type="password" id="password" placeholder="请输入密码">
-      </div>
-      <button type="submit">注册</button>
-    </form>
-    <router-link to="/">返回首页</router-link>
+      <el-form ref="loginForm" :model="loginForm" :rules="rules" class="login-form">
+        <el-form-item prop="username">
+          <el-input v-model="loginForm.username" placeholder="请输入用户名" prefix-icon="el-icon-user" />
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" prefix-icon="el-icon-lock" />
+        </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
+          <el-link type="primary" class="forgot-password">忘记密码？</el-link>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="login-button" @click="submitForm('loginForm')">登录</el-button>
+        </el-form-item>
+        <el-form-item class="register-link">
+          <span>还没有账号？</span>
+          <el-link type="primary">立即注册</el-link>
+        </el-form-item>
+      </el-form>
+    </Card>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Register'
+  name: 'Login',
+  components: {
+    Card: () => import('@/components/card.vue')
+  },
+  data() {
+    return {
+      loginForm: {
+        username: '',
+        password: '',
+        remember: false
+      },
+      rules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    // 登录表单提交方法
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          // 登录成功后的处理逻辑
+          this.$message.success('登录成功')
+          // 跳转到首页
+          this.$router.push('/')
+        } else {
+          this.$message.error('请检查输入信息')
+          return false
+        }
+      })
+    }
+  }
 }
 </script>
 
 <style scoped>
-.register {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 40px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.login-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
 }
 
-h1 {
+.login-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9)),
+              url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80');
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+}
+
+.login-card {
+  width: 400px;
+  padding: 30px;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-header {
   text-align: center;
-  color: #2c3e50;
   margin-bottom: 30px;
 }
 
-.form-group {
-  margin-bottom: 20px;
+.logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 15px;
 }
 
-label {
-  display: block;
-  margin-bottom: 8px;
+.login-header h2 {
+  color: #E64340; /* 泉州美食主题色 - 红色 */
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.login-header p {
   color: #666;
+  margin: 0;
 }
 
-input {
+.login-form {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
 }
 
-button {
+.forgot-password {
+  float: right;
+}
+
+.login-button {
   width: 100%;
-  padding: 12px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-bottom: 20px;
+  background-color: #E64340;
+  border-color: #E64340;
 }
 
-button:hover {
-  background-color: #3aa276;
+.login-button:hover {
+  background-color: #c43633;
+  border-color: #c43633;
 }
 
-router-link {
-  display: block;
+.register-link {
   text-align: center;
-  color: #42b983;
-  text-decoration: none;
+  margin-top: 20px;
 }
 
-router-link:hover {
-  text-decoration: underline;
+.register-link span {
+  color: #666;
 }
 </style>
