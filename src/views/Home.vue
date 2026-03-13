@@ -5,8 +5,9 @@
       <el-menu-item index="1" class="active" @click="$router.push('/')">首页</el-menu-item>
       <el-menu-item index="2" @click="$router.push('/community')">社区</el-menu-item>
       <el-menu-item index="3" @click="$router.push('/history')">美食文化</el-menu-item>
-      <el-menu-item index="4" @click="$router.push('/heatmap')">热图</el-menu-item>
-      <el-menu-item index="5" @click="$router.push('/login')"><i class="el-icon-user" />登录</el-menu-item>
+      <el-menu-item index="4" @click="$router.push('/coolTool')">美食工具</el-menu-item>
+      <el-menu-item index="5" @click="$router.push('/heatmap')">热图</el-menu-item>
+      <el-menu-item index="6" @click="$router.push('/login')"><i class="el-icon-user" />登录</el-menu-item>
     </el-menu>
     <!--                   轮播图内容区域                        -->
     <div class="img-container">

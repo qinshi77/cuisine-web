@@ -23,7 +23,7 @@
         </el-form-item>
         <el-form-item class="register-link">
           <span>还没有账号？</span>
-          <el-link type="primary">立即注册</el-link>
+          <el-link type="primary" @click="registerClick()">立即注册</el-link>
         </el-form-item>
       </el-form>
     </Card>
@@ -31,6 +31,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'Login',
   components: {
@@ -40,8 +42,8 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: '',
-        remember: false
+        password: ''
+        // remember: false
       },
       rules: {
         username: [
@@ -59,14 +61,27 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // 登录成功后的处理逻辑
-          this.$message.success('登录成功')
-          // 跳转到首页
-          this.$router.push('/')
+          console.log('登录表单数据:', this.loginForm)
+          axios.post('http://localhost:8081/userLogin', this.loginForm)
+            .then(response => {
+              console.log('登录成功:', response)
+              this.$message.success('登录成功')
+              // 跳转到首页
+              this.$router.push('/')
+            })
+            .catch(error => {
+              console.error('登录失败:', error)
+              this.$message.error('登录失败，请检查用户名和密码')
+            })
         } else {
           this.$message.error('请检查输入信息')
           return false
         }
       })
+    },
+    // 注册点击事件
+    registerClick() {
+      this.$router.push('/register')
     }
   }
 }

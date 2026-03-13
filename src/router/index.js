@@ -7,6 +7,8 @@ import Login from '../views/register/index.vue'
 import UserCommunity from '../views/user/index.vue'
 import FoodHistory from '../views/history/index.vue'
 import UserEdit from '../views/user/author.vue'
+import CoolTool from '../views/coolTool/index.vue'
+import UserRegister from '../views/register/userReguster.vue'
 
 Vue.use(Router)
 
@@ -42,6 +44,16 @@ export default new Router({
       path: '/heatmap',
       name: 'HeatMap',
       component: () => import('../views/viewModel/index.vue')
+    },
+    {
+      path: '/coolTool',
+      name: 'CoolTool',
+      component: CoolTool
+    },
+    {
+      path: '/register',
+      name: 'UserRegister',
+      component: UserRegister
     }
   ]
 })
