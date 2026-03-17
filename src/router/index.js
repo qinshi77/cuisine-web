@@ -9,6 +9,7 @@ import FoodHistory from '../views/history/index.vue'
 import UserEdit from '../views/user/author.vue'
 import CoolTool from '../views/coolTool/index.vue'
 import UserRegister from '../views/register/userReguster.vue'
+import Games from '../views/games/index.vue'
 
 Vue.use(Router)
 
@@ -54,6 +55,11 @@ export default new Router({
       path: '/register',
       name: 'UserRegister',
       component: UserRegister
+    },
+    {
+      path: '/games',
+      name: 'Games',
+      component: Games
     }
   ]
 })
