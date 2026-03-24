@@ -3,7 +3,7 @@
     <!--                   顶部导航栏                        -->
     <el-menu default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1" class="active" @click="$router.push('/')">首页</el-menu-item>
-      <el-menu-item index="2" @click="$router.push('/community')">社区</el-menu-item>
+      <el-menu-item index="2" @click="$router.push({ path: '/community', query: { username: username }})">社区</el-menu-item>
       <el-menu-item index="3" @click="$router.push('/history')">美食文化</el-menu-item>
       <el-menu-item index="4" @click="$router.push('/coolTool')">美食工具</el-menu-item>
       <el-menu-item index="5" @click="$router.push('/heatmap')">热图</el-menu-item>
@@ -90,14 +90,17 @@ export default {
   },
   data() {
     return {
+      username: '',
       imgs: [
-        require('@/assets/美食图片1.jpg')
+        require('@/assets/lunbotu/泉州海蛎煎.jpg'),
+        require('@/assets/lunbotu/泉州面线糊.jpg'),
+        require('@/assets/lunbotu/泉州姜母鸭.jpg')
       ],
       articles: [
         {
           title: '泉州传统小吃：面线糊',
           description: '面线糊是泉州最具代表性的传统小吃之一，以其鲜美的汤底和细腻的面线而闻名。搭配各种配料，营养丰富，口感层次分明。',
-          image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州面线糊.jpg'),
           author: '美食达人',
           date: '2024-01-15',
           history: [
@@ -156,7 +159,7 @@ export default {
         {
           title: '泉州姜母鸭：滋补美味',
           description: '姜母鸭是泉州著名的滋补菜品，选用优质鸭肉和老姜，经过精心炖煮，肉质鲜嫩，汤汁浓郁，具有很好的滋补功效。',
-          image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州姜母鸭.jpg'),
           author: '烹饪大师',
           date: '2024-01-13',
           history: [
@@ -250,7 +253,7 @@ export default {
         {
           title: '泉州海蛎煎：鲜美海味',
           description: '海蛎煎是泉州特色海味小吃，以新鲜海蛎为主料，搭配鸡蛋和调料煎制而成，口感鲜美，营养丰富。',
-          image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州海蛎煎.jpg'),
           author: '海鲜达人',
           date: '2024-01-10',
           history: [
@@ -284,6 +287,9 @@ export default {
       dialogVisible: false,
       currentFood: null
     }
+  },
+  mounted() {
+    this.username = this.$route.query.username || ''
   },
   methods: {
     handleSelect() {

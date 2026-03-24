@@ -13,7 +13,7 @@ import Games from '../views/games/index.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -29,27 +29,32 @@ export default new Router({
     {
       path: '/community',
       name: 'UserCommunity',
-      component: UserCommunity
+      component: UserCommunity,
+      meta: { requiresAuth: true }
     },
     {
       path: '/history',
       name: 'FoodHistory',
-      component: FoodHistory
+      component: FoodHistory,
+      meta: { requiresAuth: true }
     },
     {
       path: '/user/edit',
       name: 'UserEdit',
-      component: UserEdit
+      component: UserEdit,
+      meta: { requiresAuth: true }
     },
     {
       path: '/heatmap',
       name: 'HeatMap',
-      component: () => import('../views/viewModel/index.vue')
+      component: () => import('../views/viewModel/index.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/coolTool',
       name: 'CoolTool',
-      component: CoolTool
+      component: CoolTool,
+      meta: { requiresAuth: true }
     },
     {
       path: '/register',
@@ -59,7 +64,27 @@ export default new Router({
     {
       path: '/games',
       name: 'Games',
-      component: Games
+      component: Games,
+      meta: { requiresAuth: true }
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const username = localStorage.getItem('username')
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!username || username === '') {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
+export default router

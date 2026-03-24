@@ -66,8 +66,9 @@ export default {
             .then(response => {
               console.log('登录成功:', response)
               this.$message.success('登录成功')
-              // 跳转到首页
-              this.$router.push('/')
+              localStorage.setItem('username', this.loginForm.username)
+              const redirect = this.$route.query.redirect || '/'
+              this.$router.push(redirect)
             })
             .catch(error => {
               console.error('登录失败:', error)

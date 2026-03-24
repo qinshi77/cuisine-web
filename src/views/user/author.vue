@@ -28,7 +28,8 @@
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
               >
-                <el-avatar :size="120" :src="userInfo.avatar" class="avatar">
+                <el-avatar v-if="userInfo.avatar" :size="120" :src="userInfo.avatar" class="avatar" />
+                <el-avatar v-else :size="120" class="avatar">
                   {{ userInfo.username.charAt(0) }}
                 </el-avatar>
                 <div class="avatar-upload-text">更换头像</div>
@@ -39,10 +40,6 @@
           <!-- 基本信息 -->
           <el-form-item label="用户名" prop="username">
             <el-input v-model="userInfo.username" placeholder="请输入用户名" />
-          </el-form-item>
-
-          <el-form-item label="昵称" prop="nickname">
-            <el-input v-model="userInfo.nickname" placeholder="请输入昵称" />
           </el-form-item>
 
           <el-form-item label="邮箱" prop="email">
@@ -116,15 +113,17 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'UserEdit',
   data() {
     return {
+      userId: '',
+      username: '',
       saving: false,
-      uploadUrl: '/api/upload/avatar', // 实际项目中替换为真实的上传接口
+      uploadUrl: 'http://localhost:8081/api/upload/image', // 实际项目中替换为真实的上传接口
       userInfo: {
         username: '美食爱好者',
-        nickname: '吃货小王',
         email: 'user@example.com',
         phone: '13800138000',
         bio: '热爱美食，喜欢分享各种美食体验',
@@ -195,33 +194,114 @@ export default {
       }
     }
   },
+  mounted() {
+    this.username = this.$route.query.username || localStorage.getItem('username') || ''
+    this.findUserAll()
+  },
   methods: {
+    findUserAll() {
+      axios.get('http://localhost:8081/findUserAll')
+        .then(response => {
+          console.log('获取到的用户信息:', response.data)
+          const user = response.data.find(u => u.username === this.username)
+          this.userId = user.id
+          if (user) {
+            const count = user.id
+            axios.get('http://localhost:8081/api/user/info', { headers: { 'User-ID': count }})
+              .then(response => {
+                // this.userInfo = response.data
+                const data = response.data
+                this.userInfo.username = data.username
+                this.userInfo.avatar = data.avatar
+                // 邮箱和手机号暂时没有设置
+                // this.userInfo.email = data.email
+                // this.userInfo.phone = data.phone
+                this.userInfo.bio = data.bio
+                console.log('获取到的用户信息:', response.data)
+              })
+          } else {
+            this.$message.error('用户不存在,请先登录或注册')
+            this.$router.push('/login')
+          }
+        })
+        .catch(error => {
+          console.error('获取用户信息失败:', error)
+        })
+    },
     handleSelect(key) {
       console.log('点击了导航栏:', key)
     },
     handleAvatarSuccess(res, file) {
       // 实际项目中，这里应该根据后端返回的路径设置头像
       // 这里我们使用临时URL模拟
-      this.userInfo.avatar = URL.createObjectURL(file.raw)
       this.$message.success('头像上传成功')
     },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
-      const isLt2M = file.size / 1024 / 1024 < 2
+    async beforeAvatarUpload(file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      try {
+        // 2. 发送上传请求
+        const response = await axios.post('http://localhost:8081/api/upload/image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'User-ID': this.userId
+          },
+          onUploadProgress: (progressEvent) => {
+            // 上传进度回调
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            console.log('上传进度:', percent + '%')
+          }
+        })
 
-      if (!isJPG) {
-        this.$message.error('只能上传 JPG/PNG 格式的图片')
+        // 3. 处理响应
+        if (response.data.success) {
+          const imageUrl = response.data.data.url
+          this.userInfo.avatar = imageUrl
+          console.log('上传成功，图片地址:', imageUrl)
+          return imageUrl
+        } else {
+          throw new Error(response.data.message)
+        }
+      } catch (error) {
+        console.error('上传失败:', error)
+        throw error
       }
-      if (!isLt2M) {
-        this.$message.error('图片大小不能超过 2MB')
-      }
-      return isJPG && isLt2M
     },
     saveChanges() {
       this.$refs.userForm.validate((valid) => {
         if (valid) {
           this.saving = true
           // 模拟保存操作
+          axios.put('http://localhost:8081/api/user/update', {
+            username: this.userInfo.username,
+            avatar: this.userInfo.avatar,
+            bio: this.userInfo.bio
+          }, { headers: { 'User-ID': this.userId }})
+            .then(response => {
+              console.log('更新成功:', response.data)
+              // 如果需要，可以用服务器返回的数据更新
+              window.location.reload()
+              if (response.data.success) {
+                // 更新本地用户信息
+                this.userInfo = response.data.user
+
+                // 更新 localStorage 中的用户名
+                localStorage.setItem('username', this.userInfo.username)
+
+                this.$message.success('更新成功')
+                this.dialogVisible = false
+
+                // 触发事件，通知其他组件更新
+                this.$emit('user-info-updated', this.userInfo)
+              } else {
+                throw new Error(response.data.message)
+              }
+              this.$message.success('保存成功')
+            })
+            .catch(error => {
+              console.error('更新失败:', error)
+              this.$message.error('保存失败')
+            })
           setTimeout(() => {
             this.saving = false
             this.$message.success('保存成功')
@@ -235,15 +315,23 @@ export default {
     changePassword() {
       this.$refs.passwordForm.validate((valid) => {
         if (valid) {
-          // 模拟密码修改操作
-          setTimeout(() => {
+          // 密码修改操作
+          axios.put('http://localhost:8081/api/user/password', {
+            oldPassword: this.passwordForm.oldPassword,
+            newPassword: this.passwordForm.newPassword,
+            confirmPassword: this.passwordForm.confirmPassword
+          }, { headers: { 'User-ID': this.userId }}).then(response => {
+            console.log('密码修改成功:', response.data)
             this.$message.success('密码修改成功')
             this.passwordForm = {
               oldPassword: '',
               newPassword: '',
               confirmPassword: ''
             }
-          }, 1000)
+          }).catch(error => {
+            console.error('密码修改失败:', error)
+            this.$message.error('密码修改失败')
+          })
         } else {
           this.$message.error('请检查密码信息')
           return false
