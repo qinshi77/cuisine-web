@@ -345,6 +345,15 @@ export default {
         return
       }
 
+      // 违禁词检查
+      const forbiddenWords = ['违禁词1', '违禁词2', '敏感词', '不良内容']
+      const content = this.newPost.content
+      const containsForbiddenWord = forbiddenWords.some(word => content.includes(word))
+      if (containsForbiddenWord) {
+        this.$message.error('内容包含违禁词，禁止发布')
+        return
+      }
+
       const newPost = {
         id: this.posts.length + 1,
         content: this.newPost.content,
