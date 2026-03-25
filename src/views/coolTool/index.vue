@@ -64,7 +64,7 @@
             <label>排序方式：</label>
             <select v-model="sortBy" class="sort-select">
               <option value="default">默认</option>
-              <option value="sales">销量从高到低</option>
+              <option value="likes">点赞量从高到低</option>
             </select>
           </div>
         </div>
@@ -108,7 +108,7 @@
 
               <!-- 互动功能 -->
               <div class="tool-actions">
-                <button class="action-btn like-btn" :class="{ 'liked': tool.isLiked }" @click="likeTool(tool)">
+                <button class="action-btn like-btn" :class="{ 'liked': tool.liked }" @click="likeTool(tool)">
                   <i class="el-icon-thumb" />
                   <span>{{ tool.likes }}</span>
                 </button>
@@ -235,154 +235,11 @@ export default {
   name: 'CoolTool',
   data() {
     return {
+      userId: '',
       username: '',
       tools: [
-        {
-          id: 1,
-          name: '厨师刀',
-          description: '专业厨房刀具，不锈钢材质，锋利耐用',
-          use: '适用于切菜、切肉、切鱼等多种厨房操作',
-          cuisine: '适用于各种菜系，尤其是中餐和西餐',
-          usage: '使用时保持刀刃锋利，切割时要稳准，使用后及时清洗擦干',
-          buyLink: 'https://example.com/chef-knife',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20chef%20knife&size=800x800',
-          likes: 125,
-          comments: [
-            {
-              id: 1,
-              user: '美食爱好者',
-              avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=user%20avatar&size=100x100',
-              content: '这把刀非常锋利，用起来很顺手！',
-              time: '2024-01-15 10:30'
-            },
-            {
-              id: 2,
-              user: '厨房新手',
-              avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=user%20avatar%202&size=100x100',
-              content: '对于新手来说也很好用，推荐！',
-              time: '2024-01-16 14:20'
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: '不粘锅',
-          description: '高品质不粘涂层，煎炒煮炸样样精通',
-          use: '适用于煎蛋、煎饼、炒菜等多种烹饪方式',
-          cuisine: '适用于各种菜系，尤其是需要少油烹饪的菜品',
-          usage: '使用时避免使用金属铲，温度不宜过高，清洗时用软布轻轻擦拭',
-          buyLink: 'https://example.com/non-stick-pan',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=non-stick%20frying%20pan&size=800x800',
-          likes: 189,
-          comments: [
-            {
-              id: 1,
-              user: '家庭主妇',
-              avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=user%20avatar%203&size=100x100',
-              content: '用了半年了，还是很不粘，质量很好！',
-              time: '2024-01-10 09:15'
-            }
-          ]
-        },
-        {
-          id: 3,
-          name: '料理机',
-          description: '多功能料理机，搅拌、榨汁、研磨一体',
-          use: '适用于制作果汁、豆浆、酱料、馅料等',
-          cuisine: '适用于各种菜系，尤其是需要细腻口感的菜品',
-          usage: '按照说明书操作，不同食材使用不同的功能档位，使用后及时清洗',
-          buyLink: '',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=food%20processor&size=800x800',
-          likes: 98,
-          comments: []
-        },
-        {
-          id: 4,
-          name: '蒸锅',
-          description: '多层蒸笼，快速蒸熟食物，保留营养',
-          use: '适用于蒸包子、馒头、海鲜、蔬菜等',
-          cuisine: '特别适合中餐，尤其是粤菜和淮扬菜',
-          usage: '根据食物种类调整蒸制时间，水要适量，避免烧干',
-          buyLink: 'https://example.com/steamer',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=steamer%20pot&size=800x800',
-          likes: 156,
-          comments: [
-            {
-              id: 1,
-              user: '健康生活',
-              avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=user%20avatar%204&size=100x100',
-              content: '蒸出来的食物更健康，这个蒸锅很好用！',
-              time: '2024-01-12 11:45'
-            }
-          ]
-        },
-        {
-          id: 5,
-          name: '烘焙套装',
-          description: '专业烘焙工具套装，包含各种烘焙模具',
-          use: '适用于制作蛋糕、饼干、面包等烘焙食品',
-          cuisine: '适用于西式烘焙',
-          usage: '按照配方要求使用不同的模具，烘焙前要预热烤箱，使用后及时清洗',
-          buyLink: 'https://example.com/baking-tools',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=baking%20tools%20set&size=800x800',
-          likes: 87,
-          comments: []
-        },
-        {
-          id: 6,
-          name: '厨房秤',
-          description: '精准电子秤，烘焙必备，精确到0.1g',
-          use: '适用于烘焙、烹饪时精确称量食材',
-          cuisine: '特别适合烘焙和需要精确配比的菜品',
-          usage: '使用前校准，放置在平稳的地方，称量时要轻拿轻放',
-          buyLink: '',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=kitchen%20scale&size=800x800',
-          likes: 134,
-          comments: [
-            {
-              id: 1,
-              user: '烘焙达人',
-              avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=user%20avatar%205&size=100x100',
-              content: '精准度很高，烘焙必备工具！',
-              time: '2024-01-14 16:30'
-            }
-          ]
-        },
-        {
-          id: 7,
-          name: '削皮器',
-          description: '多功能削皮器，轻松处理各种水果和蔬菜',
-          use: '适用于削水果、蔬菜的皮',
-          cuisine: '适用于各种菜系',
-          usage: '使用时要注意安全，避免划伤手，使用后及时清洗',
-          buyLink: 'https://example.com/peeler',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=vegetable%20peeler&size=800x800',
-          likes: 203,
-          comments: [
-            {
-              id: 1,
-              user: '素食主义者',
-              avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=user%20avatar%206&size=100x100',
-              content: '削皮非常轻松，节省时间！',
-              time: '2024-01-11 08:50'
-            }
-          ]
-        },
-        {
-          id: 8,
-          name: '擀面杖',
-          description: '实木擀面杖，擀面均匀，手感舒适',
-          use: '适用于擀面、压面等操作',
-          cuisine: '特别适合中餐面食和西式烘焙',
-          usage: '擀面时要均匀用力，保持擀面杖清洁，使用后及时擦干',
-          buyLink: '',
-          image: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=wooden%20rolling%20pin&size=800x800',
-          likes: 112,
-          comments: []
-        }
       ],
       user: {
-
       },
       userLikedTools: [],
       selectedTool: null,
@@ -418,9 +275,9 @@ export default {
         )
       }
 
-      // 销量排序
-      if (this.sortBy === 'sales') {
-        result.sort((a, b) => b.sales - a.sales)
+      // 点赞量排序
+      if (this.sortBy === 'likes') {
+        result.sort((a, b) => b.likes - a.likes)
       }
 
       return result
@@ -429,8 +286,24 @@ export default {
   mounted() {
     this.username = this.$route.query.username || localStorage.getItem('username') || ''
     this.findUserAll()
+    setTimeout(() => {
+      this.getKitchenTools()
+    }, 500)
   },
   methods: {
+    // 获取所有的厨房工具信息
+    getKitchenTools() {
+      axios.get('http://localhost:8081/api/kitchen-tools', { headers: { 'User-ID': this.userId }})
+        .then(response => {
+          const tools = response.data.tools
+          this.tools = tools
+          this.userLikedTools = this.tools.filter(tool => tool.liked)
+          console.log('获取到的厨房工具:', tools)
+        })
+        .catch(error => {
+          console.error('获取厨房工具失败:', error)
+        })
+    },
     // 查找所有用户,根据用户名查找用户信息
     findUserAll() {
       axios.get('http://localhost:8081/findUserAll')
@@ -460,27 +333,60 @@ export default {
     },
     likeTool(tool) {
       // 检查工具是否已被当前用户点赞
-      const isLiked = tool.isLiked || false
-
-      if (isLiked) {
+      const liked = tool.liked || false
+      if (liked) {
         // 取消点赞
         tool.likes--
-        tool.isLiked = false
+        tool.liked = false
         // 从用户点赞记录中移除
         this.userLikedTools = this.userLikedTools.filter(t => t.id !== tool.id)
+        axios.delete(`http://localhost:8081/api/tools/${tool.id}/like`, {
+          headers: { 'User-ID': this.userId }
+        })
+          .then(response => {
+            console.log('取消点赞成功:', response)
+            this.$message.success('取消点赞成功')
+          })
+          .catch(error => {
+            console.error('取消点赞失败:', error)
+            this.$message.error('取消点赞失败')
+          })
       } else {
         // 添加点赞
         tool.likes++
-        tool.isLiked = true
+        tool.liked = true
         // 添加到用户点赞记录
         if (!this.userLikedTools.some(t => t.id === tool.id)) {
           this.userLikedTools.push(tool)
         }
+        axios.post(`http://localhost:8081/api/tools/${tool.id}/like`, null, {
+          headers: { 'User-ID': this.userId }
+        })
+          .then(response => {
+            console.log('点赞成功:', response)
+            this.$message.success('点赞成功')
+          })
+          .catch(error => {
+            console.error('点赞失败:', error)
+            this.$message.error('点赞失败')
+          })
       }
     },
 
     addComment(tool) {
       if (this.newComment.trim()) {
+        axios.post(`http://localhost:8081/api/tools/${tool.id}/comments`, { content: this.newComment.trim() }, {
+          headers: { 'User-ID': this.userId }
+        })
+          .then(response => {
+            console.log('评论成功:', response)
+            this.$message.success('评论成功')
+          })
+          .catch(error => {
+            console.error('评论失败:', error)
+            this.$message.error('评论失败')
+          })
+          // 刷新评论列表
         const newCommentObj = {
           id: tool.comments.length + 1,
           user: this.user.name,
