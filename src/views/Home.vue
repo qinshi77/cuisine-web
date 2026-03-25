@@ -408,7 +408,6 @@ export default {
   line-height: 1.5;
   margin: 0 0 15px 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -1,11 +1,14 @@
 <template>
   <div class="history-page">
     <!-- 顶部导航栏 -->
-    <el-menu default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+    <el-menu default-active="3" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1" @click="$router.push('/')">首页</el-menu-item>
       <el-menu-item index="2" @click="$router.push('/community')">社区</el-menu-item>
       <el-menu-item index="3" class="active">美食文化</el-menu-item>
-      <el-menu-item index="4"><i class="el-icon-user" />我的账户</el-menu-item>
+      <el-menu-item index="4" @click="$router.push('/coolTool')">美食工具</el-menu-item>
+      <el-menu-item index="5" @click="$router.push('/heatmap')">热图</el-menu-item>
+      <el-menu-item index="6" @click="$router.push('/games')">小游戏</el-menu-item>
+      <el-menu-item index="7" @click="handleLogout"><i class="el-icon-user" />退出登录</el-menu-item>
     </el-menu>
 
     <!-- 页面头部 -->
@@ -320,6 +323,13 @@ export default {
   methods: {
     handleSelect(key) {
       console.log('点击了导航栏:', key)
+    },
+    handleLogout() {
+      // 清除本地存储的用户信息
+      localStorage.removeItem('username')
+      localStorage.removeItem('token')
+      // 跳转到登录页面
+      this.$router.push('/login')
     }
   }
 }

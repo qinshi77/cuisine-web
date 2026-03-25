@@ -1,13 +1,14 @@
 <template>
   <div class="heatmap-page">
     <!-- 顶部导航栏 -->
-    <el-menu default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+    <el-menu default-active="5" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1" @click="$router.push('/')">首页</el-menu-item>
       <el-menu-item index="2" @click="$router.push('/community')">社区</el-menu-item>
       <el-menu-item index="3" @click="$router.push('/history')">美食文化</el-menu-item>
       <el-menu-item index="4" @click="$router.push('/coolTool')">美食工具</el-menu-item>
       <el-menu-item index="5" class="active">热图</el-menu-item>
-      <el-menu-item index="6" @click="$router.push('/login')"><i class="el-icon-user" />登录</el-menu-item>
+      <el-menu-item index="6" @click="$router.push('/games')">小游戏</el-menu-item>
+      <el-menu-item index="7" @click="handleLogout"><i class="el-icon-user" />退出登录</el-menu-item>
     </el-menu>
 
     <!-- 页面头部 -->
@@ -339,6 +340,13 @@ export default {
       if (level.includes('省级')) return 'warning'
       if (level.includes('市级')) return 'success'
       return 'info'
+    },
+    handleLogout() {
+      // 清除本地存储的用户信息
+      localStorage.removeItem('username')
+      localStorage.removeItem('token')
+      // 跳转到登录页面
+      this.$router.push('/login')
     }
   }
 }
