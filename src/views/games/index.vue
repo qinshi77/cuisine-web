@@ -35,6 +35,27 @@
             <p>测试你对泉州非遗美食的了解</p>
             <el-tag type="danger">挑战</el-tag>
           </el-card>
+
+          <el-card class="game-card" shadow="hover" @click.native="startGame('memory')">
+            <div class="game-icon">🧠</div>
+            <h3>记忆配对</h3>
+            <p>翻转卡片，找到相同的美食图片</p>
+            <el-tag type="primary">休闲</el-tag>
+          </el-card>
+
+          <el-card class="game-card" shadow="hover" @click.native="startGame('puzzle')">
+            <div class="game-icon">🧩</div>
+            <h3>美食拼图</h3>
+            <p>将打乱的美食图片拼回原样</p>
+            <el-tag type="info">创意</el-tag>
+          </el-card>
+
+          <el-card class="game-card" shadow="hover" @click.native="startGame('timer')">
+            <div class="game-icon">⏱️</div>
+            <h3>时间挑战</h3>
+            <p>在限定时间内完成美食相关任务</p>
+            <el-tag type="warning">刺激</el-tag>
+          </el-card>
         </div>
       </div>
 
@@ -122,6 +143,92 @@
             <el-button type="primary" :disabled="selectedAnswer === null" @click="checkQuiz">
               确认答案
             </el-button>
+          </div>
+        </div>
+
+        <div v-if="currentGame === 'memory'" class="memory-game">
+          <p class="hint">翻转卡片，找到相同的美食图片</p>
+          <div class="memory-cards">
+            <div
+              v-for="card in memoryCards"
+              :key="card.id"
+              :class="['memory-card', { 'flipped': card.flipped, 'matched': card.matched }]"
+              @click="flipCard(card)"
+            >
+              <div class="card-inner">
+                <div class="card-front">?</div>
+                <div class="card-back">
+                  <el-image :src="card.image" fit="cover" class="card-image" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="game-info">
+            <span>已配对: {{ matchedPairs }}/{{ totalPairs }}</span>
+            <span>得分: {{ score }}</span>
+          </div>
+        </div>
+
+        <div v-if="currentGame === 'puzzle'" class="puzzle-game">
+          <div class="food-display">
+            <el-card class="food-card">
+              <el-image :src="currentPuzzle.image" fit="cover" class="food-image" />
+              <h3>{{ currentPuzzle.title }}</h3>
+            </el-card>
+          </div>
+          <p class="hint">点击空白块旁边的拼图块进行移动，将图片拼回原样</p>
+          <div class="puzzle-board">
+            <div
+              v-for="piece in puzzlePieces"
+              :key="piece.id"
+              :class="['puzzle-piece', { 'empty': piece.currentPosition === 8 }]"
+              :style="{
+                gridRow: piece.row + 1,
+                gridColumn: piece.col + 1
+              }"
+              @click="movePuzzlePiece(piece)"
+            >
+              <div v-if="piece.currentPosition !== 8" class="piece-content">
+                <div
+                  class="piece-image"
+                  :style="{
+                    backgroundImage: `url(${currentPuzzle.image})`,
+                    backgroundPosition: `${-piece.col * 33.33}% ${-piece.row * 33.33}%`,
+                    backgroundSize: '300% 300%'
+                  }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentGame === 'timer'" class="timer-game">
+          <div class="timer-display">
+            <el-progress type="dashboard" :percentage="(timerSeconds / 60) * 100" :color="timerColor" :stroke-width="20" />
+            <div class="timer-text">{{ timerSeconds }}秒</div>
+          </div>
+          <div class="timer-task">
+            <h3>{{ timerTask.question }}</h3>
+            <div class="quiz-options">
+              <el-radio-group v-model="selectedAnswer">
+                <el-radio
+                  v-for="(option, index) in timerTask.options"
+                  :key="index"
+                  :label="index"
+                  class="quiz-option"
+                >
+                  {{ option }}
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </div>
+          <div class="game-buttons">
+            <el-button type="primary" :disabled="selectedAnswer === null" @click="submitTimerAnswer(selectedAnswer)">
+              提交答案
+            </el-button>
+          </div>
+          <div class="score-info">
+            <p>当前得分: {{ timerScore }}</p>
           </div>
         </div>
       </div>
@@ -292,7 +399,17 @@ export default {
       matchIngredients: [],
       currentSortFood: null,
       sortedSteps: [],
-      currentQuiz: null
+      currentQuiz: null,
+      memoryCards: [],
+      flippedCards: [],
+      matchedPairs: 0,
+      totalPairs: 6,
+      currentPuzzle: null,
+      puzzlePieces: [],
+      timerSeconds: 60,
+      timerInterval: null,
+      timerTask: null,
+      timerScore: 0
     }
   },
   computed: {
@@ -300,9 +417,21 @@ export default {
       const titles = {
         'match': '🥬 食材配对',
         'sort': '📋 步骤排序',
-        'quiz': '❓ 知识问答'
+        'quiz': '❓ 知识问答',
+        'memory': '🧠 记忆配对',
+        'puzzle': '🧩 美食拼图',
+        'timer': '⏱️ 时间挑战'
       }
       return titles[this.currentGame] || ''
+    },
+    timerColor() {
+      if (this.timerSeconds > 40) {
+        return '#67C23A'
+      } else if (this.timerSeconds > 20) {
+        return '#E6A23C'
+      } else {
+        return '#F56C6C'
+      }
     }
   },
   methods: {
@@ -321,6 +450,9 @@ export default {
       this.currentLevel = 0
       this.selectedIngredients = []
       this.selectedAnswer = null
+      this.flippedCards = []
+      this.matchedPairs = 0
+      this.stopTimer()
     },
     initGame() {
       if (this.currentGame === 'match') {
@@ -329,6 +461,146 @@ export default {
         this.initSortGame()
       } else if (this.currentGame === 'quiz') {
         this.initQuizGame()
+      } else if (this.currentGame === 'memory') {
+        this.initMemoryGame()
+      } else if (this.currentGame === 'puzzle') {
+        this.initPuzzleGame()
+      } else if (this.currentGame === 'timer') {
+        this.initTimerGame()
+      }
+    },
+    initMemoryGame() {
+      this.flippedCards = []
+      this.matchedPairs = 0
+      const foodImages = this.foods.map(food => food.image)
+      const selectedImages = foodImages.slice(0, this.totalPairs)
+      const pairedImages = [...selectedImages, ...selectedImages]
+      this.memoryCards = this.shuffleArray(pairedImages).map((image, index) => ({
+        id: index,
+        image,
+        flipped: false,
+        matched: false
+      }))
+    },
+    initPuzzleGame() {
+      const randomFood = this.foods[Math.floor(Math.random() * this.foods.length)]
+      this.currentPuzzle = randomFood
+      const pieces = []
+      const rows = 3
+      const cols = 3
+      for (let i = 0; i < rows * cols; i++) {
+        pieces.push({
+          id: i,
+          correctPosition: i,
+          currentPosition: i,
+          row: Math.floor(i / cols),
+          col: i % cols
+        })
+      }
+      this.puzzlePieces = this.shuffleArray(pieces)
+      this.puzzlePieces.forEach((piece, index) => {
+        piece.currentPosition = index
+        piece.row = Math.floor(index / cols)
+        piece.col = index % cols
+      })
+    },
+    initTimerGame() {
+      this.timerSeconds = 60
+      this.timerScore = 0
+      this.timerTask = this.generateTimerTask()
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval)
+      }
+      this.timerInterval = setInterval(() => {
+        this.timerSeconds--
+        if (this.timerSeconds <= 0) {
+          clearInterval(this.timerInterval)
+          this.showResult('error', '⏱️ 时间到！', `你的最终得分是 ${this.timerScore} 分！`, '⏱️')
+        }
+      }, 1000)
+    },
+    generateTimerTask() {
+      const tasks = [
+        { type: 'ingredient', question: '面线糊的主要食材是什么？', options: ['细面线', '大米', '面粉', '玉米粉'], correct: 0 },
+        { type: 'ingredient', question: '土笋冻的主要原料是什么？', options: ['竹笋', '沙虫', '海蛎', '粉条'], correct: 1 },
+        { type: 'ingredient', question: '姜母鸭中的"姜母"是指什么？', options: ['生姜', '老姜', '干姜', '嫩姜'], correct: 1 },
+        { type: 'step', question: '制作海蛎煎的第一步是什么？', options: ['将海蛎洗净', '调地瓜粉糊', '打散鸡蛋', '加热油锅'], correct: 0 },
+        { type: 'step', question: '制作醋肉的最后一步是什么？', options: ['腌制', '裹粉', '油炸', '调味'], correct: 2 }
+      ]
+      return tasks[Math.floor(Math.random() * tasks.length)]
+    },
+    flipCard(card) {
+      if (card.flipped || card.matched || this.flippedCards.length >= 2) {
+        return
+      }
+      card.flipped = true
+      this.flippedCards.push(card)
+      if (this.flippedCards.length === 2) {
+        setTimeout(() => {
+          this.checkMemoryMatch()
+        }, 1000)
+      }
+    },
+    checkMemoryMatch() {
+      const [card1, card2] = this.flippedCards
+      if (card1.image === card2.image) {
+        card1.matched = true
+        card2.matched = true
+        this.matchedPairs++
+        this.score += 50
+        if (this.matchedPairs === this.totalPairs) {
+          this.showResult('success', '🎉 恭喜！', '你成功完成了记忆配对游戏！', '🎉')
+        }
+      } else {
+        card1.flipped = false
+        card2.flipped = false
+      }
+      this.flippedCards = []
+    },
+    movePuzzlePiece(piece) {
+      const emptyPiece = this.puzzlePieces.find(p => p.currentPosition === 8)
+      if (!emptyPiece) return
+
+      const pieceRow = Math.floor(piece.currentPosition / 3)
+      const pieceCol = piece.currentPosition % 3
+      const emptyRow = Math.floor(emptyPiece.currentPosition / 3)
+      const emptyCol = emptyPiece.currentPosition % 3
+
+      if ((Math.abs(pieceRow - emptyRow) === 1 && pieceCol === emptyCol) ||
+          (Math.abs(pieceCol - emptyCol) === 1 && pieceRow === emptyRow)) {
+        const tempPosition = piece.currentPosition
+        piece.currentPosition = emptyPiece.currentPosition
+        emptyPiece.currentPosition = tempPosition
+
+        piece.row = Math.floor(piece.currentPosition / 3)
+        piece.col = piece.currentPosition % 3
+        emptyPiece.row = Math.floor(emptyPiece.currentPosition / 3)
+        emptyPiece.col = emptyPiece.currentPosition % 3
+
+        this.checkPuzzleCompletion()
+      }
+    },
+    checkPuzzleCompletion() {
+      const isComplete = this.puzzlePieces.every(piece =>
+        piece.currentPosition === piece.correctPosition
+      )
+      if (isComplete) {
+        this.score += 200
+        this.showResult('success', '🎉 太棒了！', '你成功完成了美食拼图！', '🎉')
+      }
+    },
+    submitTimerAnswer(answer) {
+      if (answer === this.timerTask.correct) {
+        this.timerScore += 100
+        this.timerTask = this.generateTimerTask()
+      } else {
+        this.timerScore -= 50
+      }
+    },
+    stopTimer() {
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval)
+        this.timerInterval = null
       }
     },
     initMatchGame() {
@@ -727,5 +999,199 @@ export default {
   display: flex;
   justify-content: center;
   gap: 15px;
+}
+
+/* 记忆配对游戏样式 */
+.memory-game {
+  text-align: center;
+}
+
+.memory-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.memory-card {
+  width: 120px;
+  height: 120px;
+  perspective: 1000px;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.memory-card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.memory-card.matched .card-back {
+  box-shadow: 0 0 15px #67C23A;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-front {
+  background: linear-gradient(135deg, #E64340 0%, #F56C6C 100%);
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.card-back {
+  background: white;
+  transform: rotateY(180deg);
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #666;
+}
+
+/* 美食拼图游戏样式 */
+.puzzle-game {
+  text-align: center;
+}
+
+.puzzle-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  max-width: 450px;
+  margin: 30px auto;
+  background: #333;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.puzzle-piece {
+  width: 140px;
+  height: 140px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.puzzle-piece:hover:not(.empty) {
+  background: #f9f9f9;
+  transform: scale(1.02);
+}
+
+.puzzle-piece.empty {
+  background: #333;
+  cursor: default;
+}
+
+.piece-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.piece-image {
+  width: 100%;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+/* 时间挑战游戏样式 */
+.timer-game {
+  text-align: center;
+}
+
+.timer-display {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 30px;
+}
+
+.timer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  font-weight: bold;
+  color: #333;
+}
+
+.timer-task {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.timer-task h3 {
+  color: #333;
+  font-size: 20px;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .memory-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .memory-card {
+    width: 100px;
+    height: 100px;
+  }
+
+  .puzzle-board {
+    max-width: 330px;
+  }
+
+  .puzzle-piece {
+    width: 100px;
+    height: 100px;
+  }
+
+  .game-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .game-card {
+    width: 80%;
+  }
 }
 </style>
