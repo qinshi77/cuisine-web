@@ -204,7 +204,7 @@
             <div class="form-item">
               <label>工具图片：</label>
               <div class="image-upload">
-                <input type="file" accept="image/*" class="file-input" @change="handleImageUpload">
+                <input type="file" accept="image/*" class="file-input" @change="handleImageUpload($event)">
                 <button type="button" class="upload-btn">选择图片</button>
                 <div v-if="newTool.image" class="image-preview">
                   <img :src="newTool.image" alt="工具图片预览" class="preview-image">
@@ -295,7 +295,8 @@ export default {
     getKitchenTools() {
       axios.get('http://localhost:8081/api/kitchen-tools', { headers: { 'User-ID': this.userId }})
         .then(response => {
-          const tools = response.data.tools
+          const tools = response.data.data
+          console.log(tools)
           this.tools = tools
           this.userLikedTools = this.tools.filter(tool => tool.liked)
           console.log('获取到的厨房工具:', tools)
@@ -427,6 +428,29 @@ export default {
       // 添加到工具列表
       this.tools.push(newToolObj)
 
+      const toolData = {
+        name: this.newTool.name,
+        description: this.newTool.description,
+        use: this.newTool.use,
+        cuisine: this.newTool.cuisine,
+        usage: this.newTool.usage,
+        buyLink: this.newTool.buyLink,
+        image: this.newTool.image
+      }
+
+      // 发布新工具到后端
+      axios.post('http://localhost:8081/api/kitchen-tools', toolData, {
+        headers: { 'User-ID': this.userId }
+      })
+        .then(response => {
+          console.log('工具发布成功:', response)
+          this.$message.success('工具发布成功')
+        })
+        .catch(error => {
+          console.error('工具发布失败:', error)
+          this.$message.error('工具发布失败')
+        })
+
       // 重置表单
       this.newTool = {
         name: '',
@@ -450,12 +474,25 @@ export default {
     },
     handleImageUpload(e) {
       const file = e.target.files[0]
+      console.log(file)
+
       if (file) {
-        const reader = new FileReader()
-        reader.onload = (event) => {
-          this.newTool.image = event.target.result
-        }
-        reader.readAsDataURL(file)
+        const formData = new FormData()
+        formData.append('file', file)
+        axios.post('http://localhost:8081/api/upload/image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'User-ID': this.userId
+          }
+        })
+          .then(response => {
+            console.log('上传成功:', response.data)
+            this.newTool.image = response.data.data.url
+          })
+          .catch(error => {
+            console.error('上传失败:', error)
+            this.$message.error('上传失败')
+          })
       }
     },
     removeImage() {
