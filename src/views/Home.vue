@@ -19,33 +19,6 @@
         </el-carousel-item>
       </el-carousel>
     </div>
-    <!--                   图标区域                        -->
-    <!-- <div class="icon-container">
-      <div class="icon-item">
-        <img src="../assets/icon.png" class="iconImg">
-        <span class="icon-text">提示信息</span>
-      </div>
-      <div class="icon-item">
-        <img src="../assets/icon.png" class="iconImg">
-        <span class="icon-text">提示信息</span>
-      </div>
-      <div class="icon-item">
-        <img src="../assets/icon.png" class="iconImg">
-        <span class="icon-text">提示信息</span>
-      </div>
-      <div class="icon-item">
-        <img src="../assets/icon.png" class="iconImg">
-        <span class="icon-text">提示信息</span>
-      </div>
-      <div class="icon-item">
-        <img src="../assets/icon.png" class="iconImg">
-        <span class="icon-text">提示信息</span>
-      </div>
-      <div class="icon-item">
-        <img src="../assets/icon.png" class="iconImg">
-        <span class="icon-text">提示信息</span>
-      </div>
-    </div> -->
 
     <!--                   美食文章内容管理区域                        -->
     <div class="article-container">

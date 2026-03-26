@@ -28,98 +28,9 @@
           <h2>泉州市非遗美食分布地图</h2>
         </div>
         <div class="map-container">
-          <!-- 地图背景 -->
-          <div class="map-background">
-            <div class="map-title">泉州市行政区划图</div>
-
-            <!-- 德化县 - 最北边 -->
-            <div class="district-area dehua" @click="showDistrictDetail('德化县')">
-              <div class="district-label">德化县</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('德化县')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 永春县 - 德化南边 -->
-            <div class="district-area yongchun" @click="showDistrictDetail('永春县')">
-              <div class="district-label">永春县</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('永春县')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 安溪县 - 永春西边 -->
-            <div class="district-area anxi" @click="showDistrictDetail('安溪县')">
-              <div class="district-label">安溪县</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('安溪县')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 南安市 - 安溪东边，永春南边 -->
-            <div class="district-area nanan" @click="showDistrictDetail('南安市')">
-              <div class="district-label">南安市</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('南安市')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 洛江区 - 南安东北 -->
-            <div class="district-area luojiang" @click="showDistrictDetail('洛江区')">
-              <div class="district-label">洛江区</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('洛江区')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 惠安县 - 洛江东边 -->
-            <div class="district-area huian" @click="showDistrictDetail('惠安县')">
-              <div class="district-label">惠安县</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('惠安县')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 泉港区 - 惠安北边 -->
-            <div class="district-area quangang" @click="showDistrictDetail('泉港区')">
-              <div class="district-label">泉港区</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('泉港区')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 丰泽区 - 中心区域 -->
-            <div class="district-area fengze" @click="showDistrictDetail('丰泽区')">
-              <div class="district-label">丰泽区</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('丰泽区')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 鲤城区 - 丰泽西边 -->
-            <div class="district-area licheng" @click="showDistrictDetail('鲤城区')">
-              <div class="district-label">鲤城区</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('鲤城区')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 晋江市 - 丰泽南边 -->
-            <div class="district-area jinjiang" @click="showDistrictDetail('晋江市')">
-              <div class="district-label">晋江市</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('晋江市')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-
-            <!-- 石狮市 - 晋江东南 -->
-            <div class="district-area shishi" @click="showDistrictDetail('石狮市')">
-              <div class="district-label">石狮市</div>
-              <div class="food-tags-small">
-                <span v-for="(food, idx) in getDistrictFoods('石狮市')" :key="idx" class="food-tag-mini">{{ food.name.split('泉州').pop().split('制作技艺')[0] }}</span>
-              </div>
-            </div>
-          </div>
+          <div class="map-title">泉州非遗美食分布地图</div>
+          <div class="map-desc">悬浮/点击标记查看特色非遗美食</div>
+          <div id="quanzhouMap" ref="mapContainer" />
         </div>
       </el-card>
 
@@ -180,28 +91,24 @@
         </el-col>
       </el-row>
 
-      <!-- 非遗美食图例 -->
-      <el-card class="legend-card" shadow="hover">
+      <!-- 非遗美食统计图 -->
+      <el-card class="charts-card" shadow="hover">
         <div class="card-header">
-          <i class="el-icon-info" />
-          <h2>图例说明</h2>
+          <i class="el-icon-data-analysis" />
+          <h2>非遗美食统计分析</h2>
         </div>
-        <div class="legend-content">
-          <div class="legend-item">
-            <span class="legend-color" style="background-color: #ff6b6b;" />
-            <span>国家级非遗</span>
+        <div class="charts-container">
+          <div class="chart-item">
+            <h3>各区县非遗美食数量</h3>
+            <div id="districtChart" ref="districtChart" class="chart" />
           </div>
-          <div class="legend-item">
-            <span class="legend-color" style="background-color: #ffa502;" />
-            <span>省级非遗</span>
+          <div class="chart-item">
+            <h3>非遗美食级别分布</h3>
+            <div id="levelChart" ref="levelChart" class="chart" />
           </div>
-          <div class="legend-item">
-            <span class="legend-color" style="background-color: #2ed573;" />
-            <span>市级非遗</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color" style="background-color: #70a1ff;" />
-            <span>区级非遗</span>
+          <div class="chart-item">
+            <h3>非遗美食年份分布</h3>
+            <div id="yearChart" ref="yearChart" class="chart" />
           </div>
         </div>
       </el-card>
@@ -210,6 +117,8 @@
 </template>
 
 <script>
+import * as echarts from 'echarts'
+
 export default {
   name: 'HeatMap',
   data() {
@@ -223,35 +132,40 @@ export default {
             { name: '泉州肉粽制作技艺', description: '端午节传统美食，用料讲究，制作精细', level: '市级非遗', year: '2008年' },
             { name: '泉州元宵丸制作技艺', description: '泉州元宵节传统食品，寓意团圆美满', level: '市级非遗', year: '2010年' },
             { name: '泉州春卷制作技艺', description: '又称润饼，清明节传统食品', level: '区级非遗', year: '2012年' }
-          ]
+          ],
+          value: 4
         },
         {
           name: '丰泽区',
           foods: [
             { name: '泉州姜母鸭制作技艺', description: '传统滋补菜品，选用优质食材，具有很高的营养价值', level: '市级非遗', year: '2009年' },
             { name: '泉州炸醋肉制作技艺', description: '泉州传统小吃，外酥里嫩，酸甜可口', level: '区级非遗', year: '2011年' }
-          ]
+          ],
+          value: 2
         },
         {
           name: '洛江区',
           foods: [
             { name: '洛江土笋冻制作技艺', description: '以沙虫为主料，口感Q弹，鲜美可口', level: '区级非遗', year: '2013年' },
             { name: '洛江九重粿制作技艺', description: '传统米制品，口感软糯，香甜可口', level: '区级非遗', year: '2014年' }
-          ]
+          ],
+          value: 2
         },
         {
           name: '泉港区',
           foods: [
             { name: '泉港浮粿制作技艺', description: '泉港特色小吃，外酥里嫩，香气四溢', level: '市级非遗', year: '2015年' },
             { name: '泉港猪脚饭制作技艺', description: '泉港传统美食，肉质鲜嫩，汤汁浓郁', level: '区级非遗', year: '2016年' }
-          ]
+          ],
+          value: 2
         },
         {
           name: '石狮市',
           foods: [
             { name: '石狮牛肉羹制作技艺', description: '石狮特色小吃，牛肉鲜嫩，汤汁鲜美', level: '市级非遗', year: '2011年' },
             { name: '石狮甜粿制作技艺', description: '石狮传统糕点，口感软糯，香甜可口', level: '区级非遗', year: '2013年' }
-          ]
+          ],
+          value: 2
         },
         {
           name: '晋江市',
@@ -259,28 +173,32 @@ export default {
             { name: '晋江深沪鱼丸制作技艺', description: '深沪特色小吃，鱼丸鲜嫩，汤汁鲜美', level: '省级非遗', year: '2009年' },
             { name: '晋江壶仔饭制作技艺', description: '晋江传统美食，米饭香糯，配料丰富', level: '市级非遗', year: '2012年' },
             { name: '晋江马鲛鱼羹制作技艺', description: '晋江特色小吃，鱼肉鲜嫩，口感爽滑', level: '区级非遗', year: '2014年' }
-          ]
+          ],
+          value: 3
         },
         {
           name: '南安市',
           foods: [
             { name: '南安英都麻糍制作技艺', description: '英都传统糕点，口感软糯，香甜可口', level: '市级非遗', year: '2013年' },
             { name: '南安洪濑鸡爪制作技艺', description: '洪濑特色小吃，鸡爪软烂，香气四溢', level: '区级非遗', year: '2015年' }
-          ]
+          ],
+          value: 2
         },
         {
           name: '惠安县',
           foods: [
             { name: '惠安崇武鱼卷制作技艺', description: '崇武特色美食，鱼卷鲜嫩，口感独特', level: '省级非遗', year: '2011年' },
             { name: '惠安萝卜糕制作技艺', description: '惠安传统小吃，口感软糯，香气扑鼻', level: '市级非遗', year: '2014年' }
-          ]
+          ],
+          value: 2
         },
         {
           name: '安溪县',
           foods: [
             { name: '安溪湖头米粉制作技艺', description: '湖头特色美食，米粉细滑，口感独特', level: '省级非遗', year: '2007年' },
             { name: '安溪铁观音制作技艺', description: '国家级非物质文化遗产，乌龙茶制作技艺', level: '国家级非遗', year: '2008年' }
-          ]
+          ],
+          value: 2
         },
         {
           name: '永春县',
@@ -288,16 +206,22 @@ export default {
             { name: '永春老醋制作技艺', description: '中国四大名醋之一，历史悠久，风味独特', level: '国家级非遗', year: '2011年' },
             { name: '永春榜舍龟制作技艺', description: '永春传统糕点，口感软糯，香甜可口', level: '省级非遗', year: '2009年' },
             { name: '永春白鸭汤制作技艺', description: '永春特色美食，鸭肉鲜嫩，汤清味美', level: '市级非遗', year: '2013年' }
-          ]
+          ],
+          value: 3
         },
         {
           name: '德化县',
           foods: [
             { name: '德化黑鸡制作技艺', description: '德化特色美食，鸡肉鲜嫩，营养丰富', level: '市级非遗', year: '2015年' },
             { name: '德化米粉制作技艺', description: '德化传统美食，米粉细滑，口感独特', level: '区级非遗', year: '2016年' }
-          ]
+          ],
+          value: 2
         }
-      ]
+      ],
+      mapChart: null,
+      districtChart: null,
+      levelChart: null,
+      yearChart: null
     }
   },
   computed: {
@@ -321,6 +245,24 @@ export default {
         }
       })
       return name
+    }
+  },
+  mounted() {
+    this.initMap()
+    this.initCharts()
+  },
+  beforeUnmount() {
+    if (this.mapChart) {
+      this.mapChart.dispose()
+    }
+    if (this.districtChart) {
+      this.districtChart.dispose()
+    }
+    if (this.levelChart) {
+      this.levelChart.dispose()
+    }
+    if (this.yearChart) {
+      this.yearChart.dispose()
     }
   },
   methods: {
@@ -347,6 +289,533 @@ export default {
       localStorage.removeItem('token')
       // 跳转到登录页面
       this.$router.push('/login')
+    },
+    initMap() {
+      // 泉州非遗美食数据
+      const foodData = [
+        { name: '鲤城区', value: [118.58, 24.93], food: '面线糊、润饼、土笋冻、元宵圆' },
+        { name: '丰泽区', value: [118.63, 24.90], food: '姜母鸭、肉粽、壶仔饭' },
+        { name: '洛江区', value: [118.67, 24.92], food: '土笋冻、九重粿' },
+        { name: '泉港区', value: [118.92, 25.13], food: '浮粿、口酥' },
+        { name: '石狮市', value: [118.67, 24.73], food: '石狮甜粿、牛肉羹' },
+        { name: '晋江市', value: [118.52, 24.75], food: '安海土笋冻、深沪鱼丸' },
+        { name: '南安市', value: [118.40, 24.97], food: '洪濑鸡爪、英都麻糍' },
+        { name: '惠安县', value: [118.78, 25.02], food: '崇武鱼卷、洛阳猪蹄' },
+        { name: '安溪县', value: [118.18, 25.07], food: '湖头米粉、铁观音茶点' },
+        { name: '永春县', value: [118.32, 25.33], food: '永春老醋美食、白鸭汤' },
+        { name: '德化县', value: [118.23, 25.48], food: '德化黑鸡、米粉汤' }
+      ]
+
+      // 初始化地图
+      this.mapChart = echarts.init(this.$refs.mapContainer)
+
+      // 核心修复：手动加载 + 注册地图
+      fetch('https://geo.datav.aliyun.com/areas_v3/bound/350500_full.json')
+        .then(res => res.json())
+        .then(mapData => {
+          // 注册泉州地图
+          echarts.registerMap('quanzhou', mapData)
+
+          // 配置项
+          const option = {
+            backgroundColor: '#ffffff',
+            tooltip: {
+              trigger: 'item',
+              padding: 10,
+              backgroundColor: 'rgba(255,255,255,0.98)',
+              borderColor: '#a83228',
+              borderWidth: 2,
+              formatter: params => {
+                if (params.seriesType === 'scatter') {
+                  return `
+                    <div style="min-width:180px">
+                      <div style="font-size:16px; font-weight:bold; color:#a83228;">${params.name}</div>
+                      <div style="margin-top:5px; border-top:1px solid #eee; padding-top:5px">
+                        非遗美食：<br>${params.data.food}
+                      </div>
+                    </div>
+                  `
+                } else if (params.seriesType === 'map') {
+                  const district = this.districtData.find(d => d.name === params.name)
+                  if (district) {
+                    let html = `<div style="font-weight:bold;margin-bottom:5px;">${district.name}</div>`
+                    html += '<div style="margin-top:5px;"><strong>代表性美食:</strong></div>'
+                    district.foods.slice(0, 3).forEach(food => {
+                      html += `<div style="margin-left:10px;">• ${food.name.split('制作技艺')[0]}</div>`
+                    })
+                    return html
+                  }
+                }
+                return params.name
+              }
+            },
+            geo: {
+              map: 'quanzhou',
+              roam: false,
+              zoom: 1.2,
+              itemStyle: {
+                areaColor: '#f6eee0',
+                borderColor: '#d4b598'
+              },
+              emphasis: {
+                itemStyle: {
+                  areaColor: '#f8d9b8',
+                  borderColor: '#a83228',
+                  borderWidth: 2
+                }
+              }
+            },
+            series: [{
+              type: 'scatter',
+              coordinateSystem: 'geo',
+              data: foodData,
+              symbol: 'pin',
+              symbolSize: 16,
+              itemStyle: {
+                color: '#a83228',
+                shadowBlur: 10
+              },
+              label: {
+                show: true,
+                formatter: '{b}',
+                fontSize: 12,
+                color: '#a83228'
+              },
+              emphasis: {
+                symbolSize: 24,
+                itemStyle: {
+                  color: '#c93730'
+                }
+              }
+            }]
+          }
+
+          // 渲染
+          this.mapChart.setOption(option)
+
+          // 点击事件
+          this.mapChart.on('click', (params) => {
+            if (params.seriesType === 'map') {
+              this.showDistrictDetail(params.name)
+            } else if (params.seriesType === 'scatter') {
+              this.showDistrictDetail(params.name)
+            }
+          })
+        })
+        .catch(error => {
+          console.error('加载地图数据失败:', error)
+          // 加载失败时使用模拟数据
+          this.initMapWithMockData()
+        })
+
+      // 响应式调整
+      window.addEventListener('resize', () => {
+        if (this.mapChart) {
+          this.mapChart.resize()
+        }
+      })
+    },
+    initMapWithMockData() {
+      // 模拟泉州地图数据
+      const geoJson = {
+        'type': 'FeatureCollection',
+        'features': [
+          {
+            'type': 'Feature',
+            'properties': { 'name': '鲤城区' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.65, 24.86], [118.70, 24.86], [118.70, 24.83], [118.65, 24.83], [118.65, 24.86]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '丰泽区' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.70, 24.88], [118.78, 24.88], [118.78, 24.84], [118.70, 24.84], [118.70, 24.88]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '洛江区' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.68, 24.90], [118.75, 24.90], [118.75, 24.86], [118.68, 24.86], [118.68, 24.90]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '泉港区' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.90, 25.10], [119.00, 25.10], [119.00, 25.00], [118.90, 25.00], [118.90, 25.10]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '石狮市' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.75, 24.65], [118.85, 24.65], [118.85, 24.55], [118.75, 24.55], [118.75, 24.65]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '晋江市' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.60, 24.75], [118.85, 24.75], [118.85, 24.55], [118.60, 24.55], [118.60, 24.75]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '南安市' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.20, 24.90], [118.50, 24.90], [118.50, 24.60], [118.20, 24.60], [118.20, 24.90]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '惠安县' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.75, 24.95], [119.00, 24.95], [119.00, 24.75], [118.75, 24.75], [118.75, 24.95]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '安溪县' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[117.90, 25.20], [118.20, 25.20], [118.20, 24.80], [117.90, 24.80], [117.90, 25.20]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '永春县' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[118.10, 25.30], [118.40, 25.30], [118.40, 25.00], [118.10, 25.00], [118.10, 25.30]]]
+            }
+          },
+          {
+            'type': 'Feature',
+            'properties': { 'name': '德化县' },
+            'geometry': {
+              'type': 'Polygon',
+              'coordinates': [[[117.70, 25.50], [118.00, 25.50], [118.00, 25.20], [117.70, 25.20], [117.70, 25.50]]]
+            }
+          }
+        ]
+      }
+
+      // 注册地图
+      echarts.registerMap('quanzhou', geoJson)
+
+      // 泉州非遗美食数据
+      const foodData = [
+        { name: '鲤城区', value: [118.675, 24.845], food: '面线糊、润饼、土笋冻、元宵圆' },
+        { name: '丰泽区', value: [118.74, 24.86], food: '姜母鸭、肉粽、壶仔饭' },
+        { name: '洛江区', value: [118.715, 24.88], food: '土笋冻、九重粿' },
+        { name: '泉港区', value: [118.95, 25.05], food: '浮粿、口酥' },
+        { name: '石狮市', value: [118.8, 24.6], food: '石狮甜粿、牛肉羹' },
+        { name: '晋江市', value: [118.725, 24.65], food: '安海土笋冻、深沪鱼丸' },
+        { name: '南安市', value: [118.35, 24.75], food: '洪濑鸡爪、英都麻糍' },
+        { name: '惠安县', value: [118.875, 24.85], food: '崇武鱼卷、洛阳猪蹄' },
+        { name: '安溪县', value: [118.05, 25.0], food: '湖头米粉、铁观音茶点' },
+        { name: '永春县', value: [118.25, 25.15], food: '永春老醋美食、白鸭汤' },
+        { name: '德化县', value: [117.85, 25.35], food: '德化黑鸡、米粉汤' }
+      ]
+
+      // 配置项
+      const option = {
+        backgroundColor: '#ffffff',
+        tooltip: {
+          trigger: 'item',
+          padding: 10,
+          backgroundColor: 'rgba(255,255,255,0.98)',
+          borderColor: '#a83228',
+          borderWidth: 2,
+          formatter: params => {
+            if (params.seriesType === 'scatter') {
+              return `
+                <div style="min-width:180px">
+                  <div style="font-size:16px; font-weight:bold; color:#a83228;">${params.name}</div>
+                  <div style="margin-top:5px; border-top:1px solid #eee; padding-top:5px">
+                    非遗美食：<br>${params.data.food}
+                  </div>
+                </div>
+              `
+            } else if (params.seriesType === 'map') {
+              const district = this.districtData.find(d => d.name === params.name)
+              if (district) {
+                let html = `<div style="font-weight:bold;margin-bottom:5px;">${district.name}</div>`
+                html += '<div style="margin-top:5px;"><strong>代表性美食:</strong></div>'
+                district.foods.slice(0, 3).forEach(food => {
+                  html += `<div style="margin-left:10px;">• ${food.name.split('制作技艺')[0]}</div>`
+                })
+                return html
+              }
+            }
+            return params.name
+          }
+        },
+        geo: {
+          map: 'quanzhou',
+          roam: false,
+          zoom: 1.2,
+          itemStyle: {
+            areaColor: '#f6eee0',
+            borderColor: '#d4b598'
+          },
+          emphasis: {
+            itemStyle: {
+              areaColor: '#f8d9b8',
+              borderColor: '#a83228',
+              borderWidth: 2
+            }
+          }
+        },
+        series: [{
+          type: 'scatter',
+          coordinateSystem: 'geo',
+          data: foodData,
+          symbol: 'pin',
+          symbolSize: 16,
+          itemStyle: {
+            color: '#a83228',
+            shadowBlur: 10
+          },
+          label: {
+            show: true,
+            formatter: '{b}',
+            fontSize: 12,
+            color: '#a83228'
+          },
+          emphasis: {
+            symbolSize: 24,
+            itemStyle: {
+              color: '#c93730'
+            }
+          }
+        }]
+      }
+
+      // 渲染
+      this.mapChart.setOption(option)
+
+      // 点击事件
+      this.mapChart.on('click', (params) => {
+        if (params.seriesType === 'map') {
+          this.showDistrictDetail(params.name)
+        } else if (params.seriesType === 'scatter') {
+          this.showDistrictDetail(params.name)
+        }
+      })
+    },
+    // 初始化统计图表
+    initCharts() {
+      this.initDistrictChart()
+      this.initLevelChart()
+      this.initYearChart()
+
+      // 响应式调整
+      window.addEventListener('resize', () => {
+        if (this.districtChart) this.districtChart.resize()
+        if (this.levelChart) this.levelChart.resize()
+        if (this.yearChart) this.yearChart.resize()
+      })
+    },
+    // 初始化各区县非遗美食数量柱状图
+    initDistrictChart() {
+      this.districtChart = echarts.init(this.$refs.districtChart)
+
+      const data = this.districtData.map(district => ({
+        name: district.name,
+        value: district.foods.length
+      }))
+
+      const option = {
+        backgroundColor: '#ffffff',
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          },
+          formatter: '{b}: {c}项'
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: data.map(item => item.name),
+          axisLabel: {
+            interval: 0,
+            rotate: 45
+          }
+        },
+        yAxis: {
+          type: 'value',
+          name: '数量',
+          minInterval: 1
+        },
+        series: [{
+          name: '非遗美食数量',
+          type: 'bar',
+          data: data.map(item => item.value),
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#a83228' },
+              { offset: 1, color: '#c93730' }
+            ])
+          },
+          emphasis: {
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#c93730' },
+                { offset: 1, color: '#e64340' }
+              ])
+            }
+          }
+        }]
+      }
+
+      this.districtChart.setOption(option)
+    },
+    // 初始化非遗美食级别分布饼图
+    initLevelChart() {
+      this.levelChart = echarts.init(this.$refs.levelChart)
+
+      // 统计各级别非遗美食数量
+      const levelData = {
+        '国家级非遗': 0,
+        '省级非遗': 0,
+        '市级非遗': 0,
+        '区级非遗': 0
+      }
+
+      this.districtData.forEach(district => {
+        district.foods.forEach(food => {
+          levelData[food.level]++
+        })
+      })
+
+      const data = Object.entries(levelData).map(([name, value]) => ({
+        name,
+        value
+      }))
+
+      const option = {
+        backgroundColor: '#ffffff',
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b}: {c}项 ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left',
+          data: Object.keys(levelData)
+        },
+        series: [{
+          name: '非遗级别',
+          type: 'pie',
+          radius: '60%',
+          center: ['60%', '50%'],
+          data: data,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          },
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          label: {
+            show: true,
+            formatter: '{b}: {d}%'
+          }
+        }]
+      }
+
+      this.levelChart.setOption(option)
+    },
+    // 初始化非遗美食年份分布折线图
+    initYearChart() {
+      this.yearChart = echarts.init(this.$refs.yearChart)
+
+      // 统计各年份非遗美食数量
+      const yearData = {}
+
+      this.districtData.forEach(district => {
+        district.foods.forEach(food => {
+          const year = food.year.replace('年', '')
+          if (!yearData[year]) {
+            yearData[year] = 0
+          }
+          yearData[year]++
+        })
+      })
+
+      // 按年份排序
+      const sortedYears = Object.keys(yearData).sort()
+      const data = sortedYears.map(year => yearData[year])
+
+      const option = {
+        backgroundColor: '#ffffff',
+        tooltip: {
+          trigger: 'axis',
+          formatter: '{b}年: {c}项'
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: sortedYears,
+          name: '年份'
+        },
+        yAxis: {
+          type: 'value',
+          name: '数量',
+          minInterval: 1
+        },
+        series: [{
+          name: '非遗美食数量',
+          type: 'line',
+          data: data,
+          smooth: true,
+          symbol: 'circle',
+          symbolSize: 8,
+          lineStyle: {
+            width: 3,
+            color: '#a83228'
+          },
+          itemStyle: {
+            color: '#a83228'
+          },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(168, 50, 40, 0.3)' },
+              { offset: 1, color: 'rgba(168, 50, 40, 0.1)' }
+            ])
+          }
+        }]
+      }
+
+      this.yearChart.setOption(option)
     }
   }
 }
@@ -429,170 +898,32 @@ export default {
 .map-container {
   width: 100%;
   min-height: 700px;
-}
-
-.map-background {
-  position: relative;
-  width: 100%;
-  height: 700px;
-  background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 100%);
-  border-radius: 8px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  background: #fff;
+  padding: 15px;
   overflow: hidden;
 }
 
 .map-title {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 20px;
+  text-align: center;
+  font-size: 28px;
+  color: #a83228;
+  margin-bottom: 10px;
   font-weight: bold;
-  color: #333;
-  z-index: 10;
 }
 
-.district-area {
-  position: absolute;
-  border: 2px solid #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.map-desc {
+  text-align: center;
+  color: #7a514d;
+  margin-bottom: 20px;
+  font-size: 15px;
 }
 
-.district-area:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  z-index: 5;
-}
-
-.district-label {
-  font-weight: bold;
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 5px;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-}
-
-.food-tags-small {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-  justify-content: center;
-}
-
-.food-tag-mini {
-  font-size: 10px;
-  padding: 2px 6px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 3px;
-  color: #666;
-  white-space: nowrap;
-}
-
-/* 各区县位置和颜色 */
-.dehua {
-  top: 30px;
-  left: 35%;
-  width: 18%;
-  height: 140px;
-  background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%);
-}
-
-.yongchun {
-  top: 180px;
-  left: 30%;
-  width: 16%;
-  height: 120px;
-  background: linear-gradient(135deg, #88d8b0 0%, #6cc79a 100%);
-}
-
-.anxi {
-  top: 190px;
-  left: 10%;
-  width: 18%;
-  height: 130px;
-  background: linear-gradient(135deg, #7fcdcd 0%, #5bb5b5 100%);
-}
-
-.nanan {
-  top: 310px;
-  left: 15%;
-  width: 20%;
-  height: 130px;
-  background: linear-gradient(135deg, #87ceeb 0%, #5cb3d9 100%);
-}
-
-.luojiang {
-  top: 260px;
-  left: 45%;
-  width: 12%;
-  height: 90px;
-  background: linear-gradient(135deg, #ffd3a5 0%, #ffb870 100%);
-}
-
-.huian {
-  top: 200px;
-  left: 60%;
-  width: 16%;
-  height: 140px;
-  background: linear-gradient(135deg, #ffb6c1 0%, #ff8fa3 100%);
-}
-
-.quangang {
-  top: 100px;
-  left: 65%;
-  width: 14%;
-  height: 90px;
-  background: linear-gradient(135deg, #dda0dd 0%, #d08fd0 100%);
-}
-
-.fengze {
-  top: 350px;
-  left: 42%;
-  width: 10%;
-  height: 80px;
-  background: linear-gradient(135deg, #ffd700 0%, #ffcc00 100%);
-  z-index: 2;
-}
-
-.chengxiang {
-  top: 340px;
-  left: 38%;
-  width: 8%;
-  height: 70px;
-  background: linear-gradient(135deg, #90ee90 0%, #70d870 100%);
-  z-index: 3;
-}
-
-.licheng {
-  top: 360px;
-  left: 35%;
-  width: 9%;
-  height: 70px;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
-  z-index: 3;
-}
-
-.jinjiang {
-  top: 440px;
-  left: 38%;
-  width: 18%;
-  height: 120px;
-  background: linear-gradient(135deg, #87cefa 0%, #5db3e6 100%);
-}
-
-.shishi {
-  top: 510px;
-  left: 55%;
-  width: 12%;
-  height: 90px;
-  background: linear-gradient(135deg, #98fb98 0%, #77e877 100%);
+#quanzhouMap {
+  width: 100%;
+  height: 680px;
+  border-radius: 16px;
 }
 
 .district-food-detail {
@@ -665,22 +996,34 @@ export default {
   font-size: 14px;
 }
 
-.legend-content {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  flex-wrap: wrap;
+.charts-card {
+  margin-bottom: 30px;
+  border-radius: 8px;
 }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
 }
 
-.legend-color {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
+.chart-item {
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chart-item h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+}
+
+.chart {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
 }
 </style>
