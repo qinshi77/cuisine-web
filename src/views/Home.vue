@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="home-container" @scroll="handleScroll">
     <!--                   顶部导航栏                        -->
     <el-menu default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1" class="active" @click="$router.push('/')">首页</el-menu-item>
@@ -10,21 +10,49 @@
       <el-menu-item index="6" @click="$router.push('/games')">小游戏</el-menu-item>
       <el-menu-item index="7" @click="$router.push('/login')"><i class="el-icon-user" />登录</el-menu-item>
     </el-menu>
+
+    <!-- 视差滚动背景 -->
+    <div class="parallax-bg" :style="{ transform: `translateY(${parallaxY}px)` }" />
+
     <!--                   轮播图内容区域                        -->
-    <div class="img-container">
-      <el-carousel :interval="5000" arrow="always" height="400px">
-        <el-carousel-item v-for="img in imgs" :key="img">
-          <!-- <img :src="img" alt="轮播图图片"> -->
-          <el-image :src="img" alt="轮播图图片" />
-        </el-carousel-item>
-      </el-carousel>
+    <div class="carousel-wrapper">
+      <div class="img-container">
+        <el-carousel :interval="5000" arrow="always" height="450px">
+          <el-carousel-item v-for="img in imgs" :key="img">
+            <el-image :src="img" alt="轮播图图片" class="carousel-image" />
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+    </div>
+
+    <!-- 数字滚动动画区域 -->
+    <div class="stats-container">
+      <h2 class="section-title gradient-title" data-text="非遗美食文化数据">非遗美食文化数据</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">{{ statNumbers.historicalYears }}</div>
+          <div class="stat-label">历史传承年数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ statNumbers.recipeCount }}</div>
+          <div class="stat-label">传统 recipe 数量</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ statNumbers.masterChefs }}</div>
+          <div class="stat-label">非遗传承人</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ statNumbers.foodTypes }}</div>
+          <div class="stat-label">美食种类</div>
+        </div>
+      </div>
     </div>
 
     <!--                   美食文章内容管理区域                        -->
     <div class="article-container">
-      <h2 class="section-title">美食文章</h2>
+      <h2 class="section-title gradient-title" data-text="美食文章">美食文章</h2>
       <div class="article-grid">
-        <el-card v-for="(article, index) in articles" :key="index" class="article-card" shadow="hover" @click.native="openDetail(article)">
+        <el-card v-for="(article, index) in articles" :key="index" class="article-card" shadow="hover" @click.native="openDetail(article)" @mousemove="handleCardMouseMove($event, index)" @mouseleave="resetCardTransform(index)">
           <div class="article-image">
             <el-image :src="article.image" fit="cover" class="card-image" />
           </div>
@@ -38,6 +66,42 @@
           </div>
         </el-card>
       </div>
+    </div>
+
+    <!-- 非遗美食装饰区域 -->
+    <div class="decorative-container">
+      <h2 class="section-title gradient-title" data-text="非遗美食文化">非遗美食文化</h2>
+      <div class="decorative-grid">
+        <div class="decorative-item" @click="createFloatingIcons">
+          <div class="decorative-icon-container">
+            <div class="decorative-icon">🍜</div>
+          </div>
+          <div class="decorative-text">传统工艺</div>
+        </div>
+        <div class="decorative-item" @click="createFloatingIcons">
+          <div class="decorative-icon-container">
+            <div class="decorative-icon">🔥</div>
+          </div>
+          <div class="decorative-text">匠心传承</div>
+        </div>
+        <div class="decorative-item" @click="createFloatingIcons">
+          <div class="decorative-icon-container">
+            <div class="decorative-icon">🥢</div>
+          </div>
+          <div class="decorative-text">文化底蕴</div>
+        </div>
+        <div class="decorative-item" @click="createFloatingIcons">
+          <div class="decorative-icon-container">
+            <div class="decorative-icon">🏮</div>
+          </div>
+          <div class="decorative-text">历史悠久</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 漂浮图标容器 -->
+    <div class="floating-icons-container">
+      <div v-for="(icon, index) in floatingIcons" :key="index" class="floating-icon" :style="icon.style">{{ icon.text }}</div>
     </div>
 
     <!-- 美食详情对话框 -->
@@ -258,11 +322,31 @@ export default {
         }
       ],
       dialogVisible: false,
-      currentFood: null
+      currentFood: null,
+      parallaxY: 0,
+      statNumbers: {
+        historicalYears: 0,
+        recipeCount: 0,
+        masterChefs: 0,
+        foodTypes: 0
+      },
+      targetStats: {
+        historicalYears: 1000,
+        recipeCount: 500,
+        masterChefs: 50,
+        foodTypes: 100
+      },
+      floatingIcons: [],
+      cardTransforms: {}
     }
   },
   mounted() {
     this.username = this.$route.query.username || ''
+    this.startNumberAnimation()
+    window.addEventListener('scroll', this.handleScroll)
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll)
   },
   methods: {
     handleSelect() {
@@ -272,34 +356,472 @@ export default {
       console.log('点击了详情按钮', article)
       this.currentFood = article
       this.dialogVisible = true
+    },
+    handleScroll() {
+      const scrollTop = window.pageYOffset
+      this.parallaxY = scrollTop * 0.5
+    },
+    startNumberAnimation() {
+      const duration = 2000
+      const startTime = Date.now()
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+
+        Object.keys(this.targetStats).forEach(key => {
+          this.statNumbers[key] = Math.floor(this.targetStats[key] * progress)
+        })
+
+        if (progress < 1) {
+          requestAnimationFrame(animate)
+        }
+      }
+
+      requestAnimationFrame(animate)
+    },
+    handleCardMouseMove(event, index) {
+      const card = event.currentTarget
+      const rect = card.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
+
+      const centerX = rect.width / 2
+      const centerY = rect.height / 2
+
+      const rotateX = (y - centerY) / 10
+      const rotateY = (centerX - x) / 10
+
+      this.cardTransforms[index] = {
+        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`,
+        boxShadow: `15px 15px 30px rgba(0, 0, 0, 0.1)`
+      }
+    },
+    resetCardTransform(index) {
+      this.cardTransforms[index] = {
+        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+      }
+    },
+    createFloatingIcons(event) {
+      const icons = ['🍜', '🔥', '🥢', '🏮', '❤️', '🍲', '🍖', '🍗']
+      for (let i = 0; i < 10; i++) {
+        const icon = {
+          text: icons[Math.floor(Math.random() * icons.length)],
+          style: {
+            position: 'absolute',
+            left: `${event.clientX}px`,
+            top: `${event.clientY}px`,
+            fontSize: `${Math.random() * 20 + 16}px`,
+            opacity: 1,
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+            zIndex: 9999
+          }
+        }
+
+        this.floatingIcons.push(icon)
+
+        // 动画
+        setTimeout(() => {
+          const index = this.floatingIcons.indexOf(icon)
+          if (index !== -1) {
+            this.floatingIcons.splice(index, 1)
+          }
+        }, 2000)
+
+        // 移动动画
+        const position = { x: 0, y: 0 }
+        const animation = () => {
+          position.x += (Math.random() - 0.5) * 10
+          position.y -= Math.random() * 10
+          icon.style.transform = `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`
+          icon.style.opacity -= 0.01
+
+          if (icon.style.opacity > 0) {
+            requestAnimationFrame(animation)
+          }
+        }
+
+        requestAnimationFrame(animation)
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.icon-container{
+/* 全局样式 */
+.home-container {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 视差滚动背景 */
+.parallax-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(230, 67, 64, 0.05), rgba(243, 156, 18, 0.05));
+  z-index: -1;
+  transition: transform 0.1s ease-out;
+}
+
+/* 轮播图样式 */
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  margin-top: 20px;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0;
 }
-.icon-text {
-  text-align: center;
-  font-size: 18px;
-  margin-top: 5px;
+
+.img-container {
+  width: 70%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 1.5s ease-in-out;
 }
-.icon-item {
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 数字滚动动画区域 */
+.stats-container {
+  width: 80%;
+  margin: 60px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #E64340, #F39C12, #E64340);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.stat-item {
   display: flex;
   flex-direction: column;
-  height: 100px;
-  width: 100px;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.8s ease-out;
 }
-.iconImg {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto;
+
+.stat-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
 }
+
+.stat-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: #E64340;
+  margin-bottom: 10px;
+  font-family: 'Microsoft YaHei', sans-serif;
+}
+
+.stat-label {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  font-family: 'Microsoft YaHei', sans-serif;
+}
+
+/* 文章区域样式 */
+.article-container {
+  width: 80%;
+  margin: 60px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.article-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #E64340, #F39C12, #E64340);
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.article-card {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  animation: fadeInUp 0.6s ease-out;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.article-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+}
+
+.article-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease;
+}
+
+.article-image:hover .card-image {
+  transform: scale(1.1);
+}
+
+.article-content {
+  padding: 20px;
+}
+
+.article-title {
+  color: #333;
+  font-size: 20px;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Microsoft YaHei', sans-serif;
+}
+
+.article-description {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 18px 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+}
+
+.article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.article-author {
+  color: #E64340;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.article-date {
+  color: #999;
+  font-size: 13px;
+}
+
+/* 装饰区域样式 */
+.decorative-container {
+  width: 80%;
+  margin: 60px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.decorative-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #E64340, #F39C12, #E64340);
+}
+
+.decorative-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.decorative-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  background-color: #f9f9f9;
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  animation: bounceIn 0.8s ease-out;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.decorative-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(230, 67, 64, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.decorative-item:hover::before {
+  left: 100%;
+}
+
+.decorative-item:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 12px 24px rgba(230, 67, 64, 0.15);
+  background-color: #fff;
+}
+
+.decorative-icon-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E64340, #F39C12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(230, 67, 64, 0.3);
+  transition: all 0.3s ease;
+}
+
+.decorative-item:hover .decorative-icon-container {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(230, 67, 64, 0.4);
+}
+
+.decorative-icon {
+  font-size: 40px;
+  color: #fff;
+  animation: float 3s ease-in-out infinite;
+}
+
+.decorative-text {
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  font-family: 'Microsoft YaHei', sans-serif;
+  letter-spacing: 1px;
+}
+
+/* 漂浮图标容器 */
+.floating-icons-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.floating-icon {
+  position: absolute;
+  font-size: 24px;
+  pointer-events: none;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 渐变流光标题 */
+.gradient-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Microsoft YaHei', sans-serif;
+  position: relative;
+  color: #333;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+}
+
+.gradient-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #E64340, #F39C12);
+  border-radius: 2px;
+}
+
+.gradient-title::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #E64340, #F39C12, #E64340);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  z-index: -1;
+  animation: shine 3s ease-in-out infinite;
+}
+
+/* 导航栏样式 */
 .el-menu-demo {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -309,100 +831,92 @@ export default {
   color: #E64340 !important;
   border-bottom: 2px solid #E64340;
 }
-.container {
-  width: 800px;
-  height: 800px;
-  border: 1px solid #000;
-  margin: 0 auto;
-}
-.img-container {
-  width: 60%;
-  margin: 20px auto;
-}
-.article-container {
-  width: 60%;
-  margin: 40px auto;
-  padding: 20px;
+
+/* 动画定义 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.section-title {
-  text-align: center;
-  color: #E64340;
-  margin-bottom: 30px;
-  font-size: 28px;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.article-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.05);
+  }
+  80% {
+    transform: translateY(5px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.article-card {
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.article-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
-.article-image {
-  width: 100%;
-  height: 180px;
-  overflow: hidden;
-}
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .img-container {
+    width: 90%;
+  }
 
-.card-image {
-  width: 100%;
-  height: 100%;
-}
+  .stats-container,
+  .article-container,
+  .decorative-container {
+    width: 90%;
+    padding: 20px;
+  }
 
-.article-content {
-  padding: 15px;
-}
+  .stats-grid,
+  .article-grid,
+  .decorative-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 
-.article-title {
-  color: #333;
-  font-size: 18px;
-  margin: 0 0 10px 0;
-  font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  .stat-number {
+    font-size: 36px;
+  }
 
-.article-description {
-  color: #666;
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 0 0 15px 0;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.article-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 10px;
-  border-top: 1px solid #eee;
-}
-
-.article-author {
-  color: #E64340;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.article-date {
-  color: #999;
-  font-size: 12px;
+  .gradient-title {
+    font-size: 24px;
+  }
 }
 </style>
-
