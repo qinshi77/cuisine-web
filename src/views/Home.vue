@@ -644,7 +644,6 @@ export default {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  -webkit-line-clamp: 3;
 }
 
 .article-footer {
