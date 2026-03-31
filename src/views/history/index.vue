@@ -187,12 +187,20 @@
     <div class="page-footer">
       <p>© 2024 泉州美食网 - 传承千年美食文化</p>
     </div>
+
+    <!-- AI聊天小助手 -->
+    <ai-chat-widget />
   </div>
 </template>
 
 <script>
+import AiChatWidget from '@/components/AiChatWidget.vue'
+
 export default {
   name: 'FoodHistory',
+  components: {
+    AiChatWidget
+  },
   data() {
     return {
       specialFoods: [

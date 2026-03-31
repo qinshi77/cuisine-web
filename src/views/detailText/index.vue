@@ -80,6 +80,23 @@
           </div>
         </div>
       </el-card>
+
+      <!-- AI文本 -->
+      <el-card v-if="aiText" class="content-card" shadow="hover">
+        <div class="card-header">
+          <i class="el-icon-robot" />
+          <h2>AI解析</h2>
+        </div>
+        <div class="card-content">
+          <div class="ai-text-container">
+            <p class="ai-text">{{ aiText }}</p>
+            <div class="ai-controls">
+              <el-button type="primary" icon="el-icon-microphone" @click="readAiText">朗读</el-button>
+              <el-button icon="el-icon-close" @click="stopReading">停止</el-button>
+            </div>
+          </div>
+        </div>
+      </el-card>
     </div>
   </div>
 </template>
@@ -91,11 +108,42 @@ export default {
     foodData: {
       type: Object,
       required: true
+    },
+    aiText: {
+      type: String,
+      default: ''
     }
   },
   methods: {
     handleClose() {
       this.$emit('close')
+    },
+    // 朗读AI文本内容
+    readAiText() {
+      if (!this.aiText) return
+
+      // 检查浏览器是否支持语音合成
+      if ('speechSynthesis' in window) {
+        // 创建语音实例
+        const utterance = new SpeechSynthesisUtterance(this.aiText)
+
+        // 设置语音参数
+        utterance.lang = 'zh-CN' // 使用中文
+        utterance.rate = 1 // 语速
+        utterance.pitch = 1 // 音调
+        utterance.volume = 1 // 音量
+
+        // 开始朗读
+        window.speechSynthesis.speak(utterance)
+      } else {
+        console.log('浏览器不支持语音合成')
+      }
+    },
+    // 停止朗读
+    stopReading() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+      }
     }
   }
 }
@@ -268,5 +316,32 @@ export default {
 .tip-item i {
   color: #E64340;
   margin-top: 2px;
+}
+
+.ai-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ai-text {
+  line-height: 1.8;
+  color: #555;
+  font-size: 15px;
+  text-align: justify;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.ai-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ai-controls .el-button {
+  margin-right: 10px;
 }
 </style>

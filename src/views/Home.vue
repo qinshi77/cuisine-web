@@ -112,18 +112,24 @@
       class="food-detail-dialog"
       top="20px"
     >
-      <food-detail v-if="currentFood" :food-data="currentFood" />
+      <food-detail v-if="currentFood" :food-data="currentFood" :ai-text="aiText" />
     </el-dialog>
+
+    <!-- AI聊天小助手 -->
+    <ai-chat-widget />
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import FoodDetail from './detailText/index.vue'
+import AiChatWidget from '../components/AiChatWidget.vue'
 
 export default {
   name: 'Home',
   components: {
-    FoodDetail
+    FoodDetail,
+    AiChatWidget
   },
   data() {
     return {
@@ -337,7 +343,9 @@ export default {
         foodTypes: 100
       },
       floatingIcons: [],
-      cardTransforms: {}
+      cardTransforms: {},
+      aiText: '',
+      currentArticle: ''
     }
   },
   mounted() {
@@ -356,6 +364,67 @@ export default {
       console.log('点击了详情按钮', article)
       this.currentFood = article
       this.dialogVisible = true
+      if (this.currentArticle !== article.title || this.currentArticle === '') {
+        this.aiText = ''
+        this.getAiExplain(article)
+        this.currentArticle = article.title
+      }
+    },
+    // 调用AI解释接口
+    getAiExplain(article) {
+      axios.get(`http://localhost:8081/api/ai/explain?foodName=${encodeURIComponent(article.title)}`)
+        .then(res => {
+          // 过滤AI文本，只保留汉字
+          this.aiText = this.filterAiText(res.data)
+          console.log('Filtered Ai Text:', this.aiText)
+        }).catch(e => {
+          this.aiText = '生成失败，请重试'
+        })
+    },
+    // 朗读AI文本内容
+    readAiText() {
+      if (!this.aiText) return
+
+      // 检查浏览器是否支持语音合成
+      if ('speechSynthesis' in window) {
+        // 创建语音实例
+        const utterance = new SpeechSynthesisUtterance(this.aiText)
+
+        // 设置语音参数
+        utterance.lang = 'zh-CN' // 使用中文
+        utterance.rate = 0.8 // 语速
+        utterance.pitch = 1 // 音调
+        utterance.volume = 1 // 音量
+
+        // 开始朗读
+        window.speechSynthesis.speak(utterance)
+      } else {
+        console.log('浏览器不支持语音合成')
+      }
+    },
+    // 停止朗读
+    stopReading() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+      }
+    },
+    // 过滤AI文本，只保留汉字和数字，并将数字转换为汉字
+    filterAiText(text) {
+      if (!text) return ''
+
+      // 数字转汉字的映射
+      const numMap = {
+        '0': '零', '1': '一', '2': '二', '3': '三', '4': '四',
+        '5': '五', '6': '六', '7': '七', '8': '八', '9': '九'
+      }
+
+      // 只保留汉字和数字
+      let filteredText = text.replace(/[^\u4e00-\u9fa5\d]/g, '')
+
+      // 将数字转换为汉字
+      filteredText = filteredText.replace(/\d/g, match => numMap[match] || match)
+
+      return filteredText
     },
     handleScroll() {
       const scrollTop = window.pageYOffset

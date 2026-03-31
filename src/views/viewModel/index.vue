@@ -113,14 +113,21 @@
         </div>
       </el-card>
     </div>
+
+    <!-- AI聊天小助手 -->
+    <ai-chat-widget />
   </div>
 </template>
 
 <script>
 import * as echarts from 'echarts'
+import AiChatWidget from '@/components/AiChatWidget.vue'
 
 export default {
   name: 'HeatMap',
+  components: {
+    AiChatWidget
+  },
   data() {
     return {
       selectedDistrict: null,

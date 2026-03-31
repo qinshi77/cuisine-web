@@ -66,6 +66,12 @@ const router = new Router({
       name: 'Games',
       component: Games,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/vr',
+      name: 'VR',
+      component: () => import('../views/viewModel/vr.vue'),
+      meta: { requiresAuth: true }
     }
   ]
 })

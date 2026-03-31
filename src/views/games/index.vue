@@ -253,13 +253,21 @@
           <el-button v-else @click="tryAgain">再试一次</el-button>
         </div>
       </el-dialog>
+
+      <!-- AI聊天小助手 -->
+      <ai-chat-widget />
     </div>
   </div>
 </template>
 
 <script>
+import AiChatWidget from '@/components/AiChatWidget.vue'
+
 export default {
   name: 'Games',
+  components: {
+    AiChatWidget
+  },
   data() {
     return {
       currentGame: null,

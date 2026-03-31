@@ -225,14 +225,21 @@
         </div>
       </div>
     </div>
+
+    <!-- AI聊天小助手 -->
+    <ai-chat-widget />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import AiChatWidget from '@/components/AiChatWidget.vue'
 
 export default {
   name: 'CoolTool',
+  components: {
+    AiChatWidget
+  },
   data() {
     return {
       userId: '',
