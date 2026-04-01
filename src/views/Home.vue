@@ -8,7 +8,12 @@
       <el-menu-item index="4" @click="$router.push('/coolTool')">美食工具</el-menu-item>
       <el-menu-item index="5" @click="$router.push('/heatmap')">热图</el-menu-item>
       <el-menu-item index="6" @click="$router.push('/games')">小游戏</el-menu-item>
-      <el-menu-item index="7" @click="$router.push('/login')"><i class="el-icon-user" />登录</el-menu-item>
+      <template v-if="username">
+        <el-menu-item index="7" @click="$router.push('/user/edit')"><i class="el-icon-user" />{{ username }}</el-menu-item>
+      </template>
+      <template v-else>
+        <el-menu-item index="7" @click="$router.push('/login')"><i class="el-icon-user" />登录</el-menu-item>
+      </template>
     </el-menu>
 
     <!-- 视差滚动背景 -->

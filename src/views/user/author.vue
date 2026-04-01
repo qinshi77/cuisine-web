@@ -1,11 +1,15 @@
 <template>
   <div class="user-edit-page">
     <!-- 顶部导航栏 -->
-    <el-menu default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+    <el-menu default-active="7" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1" @click="$router.push('/')">首页</el-menu-item>
       <el-menu-item index="2" @click="$router.push('/community')">社区</el-menu-item>
       <el-menu-item index="3" @click="$router.push('/history')">美食文化</el-menu-item>
-      <el-menu-item index="4" class="active"><i class="el-icon-user" />账户管理</el-menu-item>
+      <el-menu-item index="4" @click="$router.push('/coolTool')">美食工具</el-menu-item>
+      <el-menu-item index="5" @click="$router.push('/heatmap')">热图</el-menu-item>
+      <el-menu-item index="6" @click="$router.push('/games')">小游戏</el-menu-item>
+      <el-menu-item index="7" class="active" @click="$router.push('/user/edit')"><i class="el-icon-user" />{{ userInfo.username }}</el-menu-item>
+      <el-menu-item index="8" @click="handleLogout"><i class="el-icon-switch-button" />退出登录</el-menu-item>
     </el-menu>
 
     <!-- 编辑内容区域 -->
@@ -279,33 +283,23 @@ export default {
           }, { headers: { 'User-ID': this.userId }})
             .then(response => {
               console.log('更新成功:', response.data)
-              // 如果需要，可以用服务器返回的数据更新
-              window.location.reload()
-              if (response.data.success) {
-                // 更新本地用户信息
-                this.userInfo = response.data.user
+              // 更新 localStorage 中的用户名
+              localStorage.setItem('username', this.userInfo.username)
 
-                // 更新 localStorage 中的用户名
-                localStorage.setItem('username', this.userInfo.username)
+              // 触发事件，通知其他组件更新
+              this.$emit('user-info-updated', this.userInfo)
 
-                this.$message.success('更新成功')
-                this.dialogVisible = false
-
-                // 触发事件，通知其他组件更新
-                this.$emit('user-info-updated', this.userInfo)
-              } else {
-                throw new Error(response.data.message)
-              }
-              this.$message.success('保存成功')
+              this.$message.success('更新成功')
+              // 刷新页面，确保所有导航栏都更新
+              window.location.href = '/'
             })
             .catch(error => {
               console.error('更新失败:', error)
               this.$message.error('保存失败')
             })
-          setTimeout(() => {
-            this.saving = false
-            this.$message.success('保存成功')
-          }, 1000)
+            .finally(() => {
+              this.saving = false
+            })
         } else {
           this.$message.error('请检查表单信息')
           return false
@@ -337,6 +331,13 @@ export default {
           return false
         }
       })
+    },
+    handleLogout() {
+      // 清除本地存储的用户信息
+      localStorage.removeItem('username')
+      localStorage.removeItem('token')
+      // 跳转到登录页面
+      this.$router.push('/login')
     }
   }
 }

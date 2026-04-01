@@ -8,7 +8,8 @@
       <el-menu-item index="4" @click="$router.push('/coolTool')">美食工具</el-menu-item>
       <el-menu-item index="5" class="active">热图</el-menu-item>
       <el-menu-item index="6" @click="$router.push('/games')">小游戏</el-menu-item>
-      <el-menu-item index="7" @click="handleLogout"><i class="el-icon-user" />退出登录</el-menu-item>
+      <el-menu-item index="7" @click="$router.push('/user/edit')"><i class="el-icon-user" />{{ username }}</el-menu-item>
+      <el-menu-item index="8" @click="handleLogout"><i class="el-icon-switch-button" />退出登录</el-menu-item>
     </el-menu>
 
     <!-- 页面头部 -->
@@ -130,6 +131,7 @@ export default {
   },
   data() {
     return {
+      username: localStorage.getItem('username') || '',
       selectedDistrict: null,
       districtData: [
         {

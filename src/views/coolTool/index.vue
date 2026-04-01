@@ -8,7 +8,8 @@
       <el-menu-item index="4" class="active" @click="$router.push('/coolTool')">美食工具</el-menu-item>
       <el-menu-item index="5" @click="$router.push('/heatmap')">热图</el-menu-item>
       <el-menu-item index="6" @click="$router.push('/games')">小游戏</el-menu-item>
-      <el-menu-item index="7" @click="handleLogout"><i class="el-icon-user" />退出登录</el-menu-item>
+      <el-menu-item index="7" @click="$router.push('/user/edit')"><i class="el-icon-user" />{{ username }}</el-menu-item>
+      <el-menu-item index="8" @click="handleLogout"><i class="el-icon-switch-button" />退出登录</el-menu-item>
     </el-menu>
     <div class="cool-tool-page">
       <!-- 左侧用户信息区域 -->
