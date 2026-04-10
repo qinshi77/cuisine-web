@@ -3,7 +3,7 @@
     <div class="login-bg" /> <!-- 登录背景图片 -->
     <Card class="login-card">
       <div class="login-header">
-        <img src="@/assets/logo.png" alt="泉州美食" class="logo">
+        <img src="@/assets/美食网站logo.png" alt="泉州美食" class="logo">
         <h2>泉州美食网</h2>
         <p>登录您的账号</p>
       </div>
