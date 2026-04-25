@@ -16,7 +16,7 @@
         </el-form-item>
         <el-form-item>
           <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
-          <el-link type="primary" class="forgot-password">忘记密码？</el-link>
+          <!-- <el-link type="primary" class="forgot-password">忘记密码？</el-link> -->
         </el-form-item>
         <el-form-item>
           <el-button type="primary" class="login-button" @click="submitForm('loginForm')">登录</el-button>

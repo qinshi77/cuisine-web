@@ -37,7 +37,7 @@
             </el-col>
             <el-col :span="12">
               <el-image
-                src="https://images.unsplash.com/photo-1568691540442-4c61c9f76b7d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+                src="http://localhost:8081/images/f83f0124-7750-4c28-b757-3f701494063e.png"
                 fit="cover"
                 class="intro-image"
               />
@@ -209,19 +209,19 @@ export default {
         {
           name: '面线糊',
           description: '泉州传统小吃，以细面线为主料，配以各种海鲜、肉类等配料，汤鲜味美，是泉州人早餐的首选。',
-          image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州面线糊.jpg'),
           tags: ['传统小吃', '早餐', '必吃']
         },
         {
           name: '土笋冻',
           description: '泉州特色小吃，以沙虫为主料制成，口感Q弹，富含胶原蛋白，是夏季消暑佳品。',
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州土笋冻.png'),
           tags: ['特色小吃', '凉菜', '非遗']
         },
         {
           name: '姜母鸭',
           description: '泉州传统名菜，选用优质鸭肉与老姜炖煮，具有滋补养颜的功效，是冬季进补佳品。',
-          image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州姜母鸭.jpg'),
           tags: ['传统名菜', '进补', '特色']
         },
         {
@@ -233,7 +233,7 @@ export default {
         {
           name: '海蛎煎',
           description: '泉州特色海味小吃，以新鲜海蛎为主料，裹以地瓜粉煎制，外酥里嫩，鲜美可口。',
-          image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州海蛎煎.jpg'),
           tags: ['海鲜', '特色小吃', '街头美食']
         },
         {
@@ -318,13 +318,13 @@ export default {
         {
           name: '泉州面线糊制作技艺',
           description: '福建省非物质文化遗产，历史悠久，制作工艺讲究，是泉州最具代表性的小吃之一。',
-          image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州面线糊.jpg'),
           year: '省级非遗'
         },
         {
           name: '泉州姜母鸭制作技艺',
           description: '传统滋补菜品制作技艺，选用优质食材，经过精心炖煮，具有很高的营养价值。',
-          image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+          image: require('@/assets/lunbotu/泉州姜母鸭.jpg'),
           year: '市级非遗'
         }
       ]

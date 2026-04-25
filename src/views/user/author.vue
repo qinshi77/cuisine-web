@@ -89,7 +89,7 @@
         </el-card>
 
         <!-- 账户安全 -->
-        <el-card class="security-card" shadow="hover" style="margin-top: 30px;">
+        <!-- <el-card class="security-card" shadow="hover" style="margin-top: 30px;">
           <div class="card-header">
             <h3>账户安全</h3>
           </div>
@@ -110,7 +110,7 @@
               </template>
             </el-table-column>
           </el-table>
-        </el-card>
+        </el-card> -->
       </el-card>
     </div>
   </div>

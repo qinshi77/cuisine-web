@@ -295,7 +295,7 @@ export default {
         {
           title: '铁观音制作技艺',
           description: '铁观音是福建泉州安溪的特产，是中国十大名茶之一，以其独特的兰花香和醇厚的口感而闻名。铁观音制作技艺是国家级非物质文化遗产。',
-          image: '',
+          image: require('@/assets/lunbotu/铁观音.png'),
           author: '茶艺大师',
           date: '2024-01-09',
           history: [
@@ -325,7 +325,7 @@ export default {
         {
           title: '灵源万应茶制作技艺',
           description: '灵源万应茶是泉州晋江灵源山的特产，是一种传统的药食同源饮品，具有清热解毒、健脾开胃的功效。',
-          image: '',
+          image: require('@/assets/lunbotu/灵源万应茶.png'),
           author: '中药专家',
           date: '2024-01-08',
           history: [
@@ -353,7 +353,7 @@ export default {
         {
           title: '成珍桔红糕制作技艺',
           description: '成珍桔红糕是泉州晋江的传统糕点，以糯米粉、白糖、桔子汁为主要原料，口感软糯，甜而不腻，具有浓郁的桔子香味。',
-          image: '',
+          image: require('@/assets/lunbotu/成珍桔红糕.png'),
           author: '糕点师傅',
           date: '2024-01-07',
           history: [
@@ -383,7 +383,7 @@ export default {
         {
           title: '源和堂蜜饯制作技艺',
           description: '源和堂蜜饯是泉州的传统食品，以各种水果为原料，经过腌制、糖渍等工艺制作而成，口感酸甜可口，是泉州人喜爱的零食。',
-          image: '',
+          image: require('@/assets/lunbotu/源和堂蜜饯.png'),
           author: '蜜饯专家',
           date: '2024-01-06',
           history: [
@@ -412,7 +412,7 @@ export default {
         {
           title: '衙口花生制作技艺',
           description: '衙口花生是泉州晋江衙口的特产，以其颗粒饱满、口感酥脆、香味浓郁而闻名，是泉州著名的传统食品。',
-          image: '',
+          image: require('@/assets/lunbotu/衙口花生.png'),
           author: '花生专家',
           date: '2024-01-05',
           history: [
@@ -440,7 +440,7 @@ export default {
         {
           title: '海盐晒制技艺',
           description: '海盐晒制技艺是泉州沿海地区的传统技艺，通过太阳能蒸发海水，提取海盐，是泉州盐业的重要组成部分。',
-          image: '',
+          image: require('@/assets/lunbotu/海盐.png'),
           author: '盐业专家',
           date: '2024-01-04',
           history: [
@@ -468,7 +468,7 @@ export default {
         {
           title: '顺德堂老醋制作技艺',
           description: '顺德堂老醋是泉州永春的特产，以糯米、红曲为主要原料，经过长期发酵而成，具有色泽红亮、酸味醇厚的特点。',
-          image: '',
+          image: require('@/assets/lunbotu/顺德堂老醋.png'),
           author: '醋业专家',
           date: '2024-01-03',
           history: [
@@ -496,7 +496,7 @@ export default {
         {
           title: '惠安酱油酿造技艺',
           description: '惠安酱油是泉州惠安的特产，以大豆、小麦为主要原料，经过传统工艺酿造而成，具有色泽红亮、味道鲜美的特点。',
-          image: '',
+          image: require('@/assets/lunbotu/惠安酱油.png'),
           author: '酱油专家',
           date: '2024-01-02',
           history: [
