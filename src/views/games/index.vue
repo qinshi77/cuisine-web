@@ -52,10 +52,10 @@
             <el-tag type="info">创意</el-tag>
           </el-card>
 
-          <el-card class="game-card" shadow="hover" @click.native="startGame('timer')">
-            <div class="game-icon">⏱️</div>
-            <h3>时间挑战</h3>
-            <p>在限定时间内完成美食相关任务</p>
+          <el-card class="game-card" shadow="hover" @click.native="startGame('classify')">
+            <div class="game-icon">🏷️</div>
+            <h3>美食分类</h3>
+            <p>将美食快速分类到正确类别</p>
             <el-tag type="warning">刺激</el-tag>
           </el-card>
         </div>
@@ -178,25 +178,25 @@
               <h3>{{ currentPuzzle.title }}</h3>
             </el-card>
           </div>
-          <p class="hint">点击空白块旁边的拼图块进行移动，将图片拼回原样</p>
+          <p class="hint">点击拼图碎片进行旋转，将图片旋转到正确方向即可通关</p>
           <div class="puzzle-board">
             <div
               v-for="piece in puzzlePieces"
               :key="piece.id"
-              :class="['puzzle-piece', { 'empty': piece.currentPosition === 8 }]"
+              class="puzzle-piece"
               :style="{
                 gridRow: piece.row + 1,
                 gridColumn: piece.col + 1
               }"
-              @click="movePuzzlePiece(piece)"
+              @click="rotatePuzzlePiece(piece)"
             >
-              <div v-if="piece.currentPosition !== 8" class="piece-content">
+              <div class="piece-content" :style="{ transform: `rotate(${piece.rotation}deg)` }">
                 <div
                   class="piece-image"
                   :style="{
                     backgroundImage: `url(${currentPuzzle.image})`,
-                    backgroundPosition: `${-piece.col * 33.33}% ${-piece.row * 33.33}%`,
-                    backgroundSize: '300% 300%'
+                    backgroundPosition: `${-piece.col * 50}% ${-piece.row * 50}%`,
+                    backgroundSize: '200% 200%'
                   }"
                 />
               </div>
@@ -204,33 +204,27 @@
           </div>
         </div>
 
-        <div v-if="currentGame === 'timer'" class="timer-game">
-          <div class="timer-display">
-            <el-progress type="dashboard" :percentage="(timerSeconds / 60) * 100" :color="timerColor" :stroke-width="20" />
-            <div class="timer-text">{{ timerSeconds }}秒</div>
+        <div v-if="currentGame === 'classify'" class="classify-game">
+          <div class="classify-task">
+            <el-card class="food-show-card">
+              <el-image :src="currentClassifyFood.image" fit="cover" class="classify-food-image" />
+              <h3>{{ currentClassifyFood.title }}</h3>
+            </el-card>
           </div>
-          <div class="timer-task">
-            <h3>{{ timerTask.question }}</h3>
-            <div class="quiz-options">
-              <el-radio-group v-model="selectedAnswer">
-                <el-radio
-                  v-for="(option, index) in timerTask.options"
-                  :key="index"
-                  :label="index"
-                  class="quiz-option"
-                >
-                  {{ option }}
-                </el-radio>
-              </el-radio-group>
-            </div>
-          </div>
-          <div class="game-buttons">
-            <el-button type="primary" :disabled="selectedAnswer === null" @click="submitTimerAnswer(selectedAnswer)">
-              提交答案
+          <p class="hint">判断这道美食属于哪个地方</p>
+          <div class="classify-options">
+            <el-button
+              v-for="(category, index) in classifyCategories"
+              :key="index"
+              :class="['classify-btn', { 'selected': selectedCategory === index }]"
+              @click="selectCategory(index)"
+            >
+              {{ category }}
             </el-button>
           </div>
-          <div class="score-info">
-            <p>当前得分: {{ timerScore }}</p>
+          <div class="game-info">
+            <span>得分: {{ classifyScore }}</span>
+            <span>剩余时间: {{ classifySeconds }}秒</span>
           </div>
         </div>
       </div>
@@ -417,10 +411,12 @@ export default {
       totalPairs: 6,
       currentPuzzle: null,
       puzzlePieces: [],
-      timerSeconds: 60,
-      timerInterval: null,
-      timerTask: null,
-      timerScore: 0
+      classifySeconds: 30,
+      classifyInterval: null,
+      currentClassifyFood: null,
+      classifyScore: 0,
+      selectedCategory: null,
+      classifyCategories: ['福建', '四川', '广东', '山东']
     }
   },
   computed: {
@@ -431,18 +427,9 @@ export default {
         'quiz': '❓ 知识问答',
         'memory': '🧠 记忆配对',
         'puzzle': '🧩 美食拼图',
-        'timer': '⏱️ 时间挑战'
+        'classify': '🏷️ 美食分类'
       }
       return titles[this.currentGame] || ''
-    },
-    timerColor() {
-      if (this.timerSeconds > 40) {
-        return '#67C23A'
-      } else if (this.timerSeconds > 20) {
-        return '#E6A23C'
-      } else {
-        return '#F56C6C'
-      }
     }
   },
   methods: {
@@ -463,7 +450,7 @@ export default {
       this.selectedAnswer = null
       this.flippedCards = []
       this.matchedPairs = 0
-      this.stopTimer()
+      this.stopClassify()
     },
     initGame() {
       if (this.currentGame === 'match') {
@@ -476,8 +463,8 @@ export default {
         this.initMemoryGame()
       } else if (this.currentGame === 'puzzle') {
         this.initPuzzleGame()
-      } else if (this.currentGame === 'timer') {
-        this.initTimerGame()
+      } else if (this.currentGame === 'classify') {
+        this.initClassifyGame()
       }
     },
     initMemoryGame() {
@@ -500,45 +487,71 @@ export default {
       const rows = 3
       const cols = 3
       for (let i = 0; i < rows * cols; i++) {
+        const randomRotation = [0, 90, 180, 270][Math.floor(Math.random() * 4)]
         pieces.push({
           id: i,
           correctPosition: i,
           currentPosition: i,
           row: Math.floor(i / cols),
-          col: i % cols
+          col: i % cols,
+          rotation: randomRotation
         })
       }
-      this.puzzlePieces = this.shuffleArray(pieces)
-      this.puzzlePieces.forEach((piece, index) => {
-        piece.currentPosition = index
-        piece.row = Math.floor(index / cols)
-        piece.col = index % cols
-      })
+      this.puzzlePieces = pieces
     },
-    initTimerGame() {
-      this.timerSeconds = 60
-      this.timerScore = 0
-      this.timerTask = this.generateTimerTask()
-      if (this.timerInterval) {
-        clearInterval(this.timerInterval)
+    initClassifyGame() {
+      this.classifySeconds = 30
+      this.classifyScore = 0
+      this.selectedCategory = null
+      this.currentClassifyFood = this.getRandomClassifyFood()
+      if (this.classifyInterval) {
+        clearInterval(this.classifyInterval)
       }
-      this.timerInterval = setInterval(() => {
-        this.timerSeconds--
-        if (this.timerSeconds <= 0) {
-          clearInterval(this.timerInterval)
-          this.showResult('error', '⏱️ 时间到！', `你的最终得分是 ${this.timerScore} 分！`, '⏱️')
+      this.classifyInterval = setInterval(() => {
+        this.classifySeconds--
+        if (this.classifySeconds <= 0) {
+          clearInterval(this.classifyInterval)
+          this.showResult('error', '⏱️ 时间到！', `你的最终得分是 ${this.classifyScore} 分！`, '⏱️')
         }
       }, 1000)
     },
-    generateTimerTask() {
-      const tasks = [
-        { type: 'ingredient', question: '面线糊的主要食材是什么？', options: ['细面线', '大米', '面粉', '玉米粉'], correct: 0 },
-        { type: 'ingredient', question: '土笋冻的主要原料是什么？', options: ['竹笋', '沙虫', '海蛎', '粉条'], correct: 1 },
-        { type: 'ingredient', question: '姜母鸭中的"姜母"是指什么？', options: ['生姜', '老姜', '干姜', '嫩姜'], correct: 1 },
-        { type: 'step', question: '制作海蛎煎的第一步是什么？', options: ['将海蛎洗净', '调地瓜粉糊', '打散鸡蛋', '加热油锅'], correct: 0 },
-        { type: 'step', question: '制作醋肉的最后一步是什么？', options: ['腌制', '裹粉', '油炸', '调味'], correct: 2 }
+    getRandomClassifyFood() {
+      const foodsWithRegion = [
+        { title: '佛跳墙', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 0 },
+        { title: '厦门沙茶面', image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 0 },
+        { title: '泉州面线糊', image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 0 },
+        { title: '福州鱼丸', image: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 0 },
+        { title: '川菜宫保鸡丁', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 1 },
+        { title: '麻婆豆腐', image: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 1 },
+        { title: '水煮鱼', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 1 },
+        { title: '回锅肉', image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 1 },
+        { title: '白切鸡', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 2 },
+        { title: '叉烧饭', image: 'https://images.unsplash.com/photo-1567337710282-00832b415979?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 2 },
+        { title: '虾饺', image: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 2 },
+        { title: '煲仔饭', image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 2 },
+        { title: '德州扒鸡', image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 3 },
+        { title: '济南把子肉', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 3 },
+        { title: '青岛海鲜', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 3 },
+        { title: '油旋', image: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', region: 3 }
       ]
-      return tasks[Math.floor(Math.random() * tasks.length)]
+      return foodsWithRegion[Math.floor(Math.random() * foodsWithRegion.length)]
+    },
+    selectCategory(index) {
+      this.selectedCategory = index
+      if (index === this.currentClassifyFood.region) {
+        this.classifyScore += 50
+        this.currentClassifyFood = this.getRandomClassifyFood()
+        this.classifySeconds = 30
+      } else {
+        this.classifyScore -= 25
+        if (this.classifyScore < 0) this.classifyScore = 0
+      }
+    },
+    stopClassify() {
+      if (this.classifyInterval) {
+        clearInterval(this.classifyInterval)
+        this.classifyInterval = null
+      }
     },
     flipCard(card) {
       if (card.flipped || card.matched || this.flippedCards.length >= 2) {
@@ -568,50 +581,17 @@ export default {
       }
       this.flippedCards = []
     },
-    movePuzzlePiece(piece) {
-      const emptyPiece = this.puzzlePieces.find(p => p.currentPosition === 8)
-      if (!emptyPiece) return
-
-      const pieceRow = Math.floor(piece.currentPosition / 3)
-      const pieceCol = piece.currentPosition % 3
-      const emptyRow = Math.floor(emptyPiece.currentPosition / 3)
-      const emptyCol = emptyPiece.currentPosition % 3
-
-      if ((Math.abs(pieceRow - emptyRow) === 1 && pieceCol === emptyCol) ||
-          (Math.abs(pieceCol - emptyCol) === 1 && pieceRow === emptyRow)) {
-        const tempPosition = piece.currentPosition
-        piece.currentPosition = emptyPiece.currentPosition
-        emptyPiece.currentPosition = tempPosition
-
-        piece.row = Math.floor(piece.currentPosition / 3)
-        piece.col = piece.currentPosition % 3
-        emptyPiece.row = Math.floor(emptyPiece.currentPosition / 3)
-        emptyPiece.col = emptyPiece.currentPosition % 3
-
-        this.checkPuzzleCompletion()
-      }
+    rotatePuzzlePiece(piece) {
+      const pieceIndex = this.puzzlePieces.indexOf(piece)
+      piece.rotation = (piece.rotation + 90) % 360
+      this.$set(this.puzzlePieces, pieceIndex, piece)
+      this.checkPuzzleCompletion()
     },
     checkPuzzleCompletion() {
-      const isComplete = this.puzzlePieces.every(piece =>
-        piece.currentPosition === piece.correctPosition
-      )
+      const isComplete = this.puzzlePieces.every(piece => piece.rotation === 0)
       if (isComplete) {
         this.score += 200
         this.showResult('success', '🎉 太棒了！', '你成功完成了美食拼图！', '🎉')
-      }
-    },
-    submitTimerAnswer(answer) {
-      if (answer === this.timerTask.correct) {
-        this.timerScore += 100
-        this.timerTask = this.generateTimerTask()
-      } else {
-        this.timerScore -= 50
-      }
-    },
-    stopTimer() {
-      if (this.timerInterval) {
-        clearInterval(this.timerInterval)
-        this.timerInterval = null
       }
     },
     initMatchGame() {
@@ -1124,20 +1104,16 @@ export default {
   justify-content: center;
 }
 
-.puzzle-piece:hover:not(.empty) {
-  background: #f9f9f9;
-  transform: scale(1.02);
-}
-
-.puzzle-piece.empty {
-  background: #333;
-  cursor: default;
+.puzzle-piece:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .piece-content {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  transition: transform 0.3s ease;
 }
 
 .piece-image {
@@ -1146,41 +1122,60 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* 时间挑战游戏样式 */
-.timer-game {
+/* 美食分类游戏样式 */
+.classify-game {
   text-align: center;
 }
 
-.timer-display {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  margin: 0 auto 30px;
-}
-
-.timer-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 36px;
-  font-weight: bold;
-  color: #333;
-}
-
-.timer-task {
-  background: #fff;
-  border-radius: 12px;
-  padding: 30px;
+.classify-task {
+  display: flex;
+  justify-content: center;
   margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.timer-task h3 {
-  color: #333;
-  font-size: 20px;
-  margin-bottom: 25px;
-  line-height: 1.6;
+.food-show-card {
+  width: 300px;
+  text-align: center;
+}
+
+.classify-food-image {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+}
+
+.classify-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.classify-btn {
+  padding: 15px 30px;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.classify-btn:hover {
+  transform: scale(1.05);
+}
+
+.classify-btn.selected {
+  background-color: #E64340;
+  border-color: #E64340;
+  color: #fff;
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #666;
 }
 
 /* 响应式调整 */

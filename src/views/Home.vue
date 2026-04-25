@@ -35,15 +35,15 @@
       <h2 class="section-title gradient-title" data-text="非遗美食文化数据">非遗美食文化数据</h2>
       <div class="stats-grid">
         <div class="stat-item">
-          <div class="stat-number">{{ statNumbers.historicalYears }}</div>
+          <div class="stat-number">{{ statNumbers.historicalYears }}+</div>
           <div class="stat-label">历史传承年数</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number">{{ statNumbers.recipeCount }}</div>
+          <div class="stat-number">{{ statNumbers.recipeCount }}+</div>
           <div class="stat-label">传统 recipe 数量</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number">{{ statNumbers.masterChefs }}</div>
+          <div class="stat-number">{{ statNumbers.masterChefs }}+</div>
           <div class="stat-label">非遗传承人</div>
         </div>
         <div class="stat-item">
@@ -342,10 +342,10 @@ export default {
         foodTypes: 0
       },
       targetStats: {
-        historicalYears: 1000,
-        recipeCount: 500,
-        masterChefs: 50,
-        foodTypes: 100
+        historicalYears: 800,
+        recipeCount: 100,
+        masterChefs: 30,
+        foodTypes: 109
       },
       floatingIcons: [],
       cardTransforms: {},
