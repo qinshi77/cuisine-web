@@ -41,6 +41,10 @@
           <h2>制作过程</h2>
         </div>
         <div class="card-content">
+          <!-- 步骤图片 -->
+          <div v-if="foodData.stepsImage" class="steps-image-wrapper">
+            <el-image :src="foodData.stepsImage" class="steps-image" />
+          </div>
           <div class="steps-container">
             <div v-for="(step, index) in foodData.steps" :key="index" class="step-item">
               <div class="step-number">{{ index + 1 }}</div>
@@ -247,6 +251,20 @@ export default {
   font-size: 15px;
   margin-bottom: 15px;
   text-align: justify;
+}
+
+.steps-image-wrapper {
+  width: 100%;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.steps-image {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .steps-container {

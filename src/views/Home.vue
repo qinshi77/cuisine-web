@@ -173,6 +173,7 @@ export default {
           title: '泉州传统小吃：面线糊',
           description: '面线糊是泉州最具代表性的传统小吃之一，以其鲜美的汤底和细腻的面线而闻名。搭配各种配料，营养丰富，口感层次分明。',
           image: require('@/assets/lunbotu/泉州面线糊.jpg'),
+          stepsImage: require('@/assets/烹饪步骤.png'),
           author: '美食达人',
           date: '2024-01-15',
           history: [
